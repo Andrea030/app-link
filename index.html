@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root[data-theme="dark"] {
     --bg: #070B1E;
@@ -2977,7 +2978,7 @@ function renderScanner() {
       <h3>3. Recomendación Fisioterapéutica</h3>
       <p class="small" style="margin-top:6px">${esc(res.recommendation)}</p>
       <div class="row wrap" style="margin-top:14px">
-        <button class="btn" onclick="saveBiometricScan()">💾 Guardar en Historial e Informe</button>
+        <button class="btn" onclick="saveBiometricScan()">📄 Guardar en un PDF en tu teléfono</button>
         <button class="btn ghost" onclick="UI.scan.step=2;render()">✏️ Editar datos</button>
         <button class="btn alt" onclick="UI.scan.step=1;UI.scan.img=null;render()">🔄 Nuevo escáner</button>
       </div>
@@ -3108,17 +3109,179 @@ function processBiometricScan(e) {
   window.scrollTo(0, 0);
 }
 
-function saveBiometricScan() {
+async function saveBiometricScan() {
   const sc = UI.scan;
   if (!sc.result) return;
-  const summary = `Zona: ${sc.zone} (${sc.side}) | ${sc.age} años, ${sc.gender}, IMC ${sc.result.bmi} | Alineación: ${sc.result.postureScore}/100 | Goniometría: ${sc.result.goniometry.map(g => g.mov + " " + g.val + "°").join(", ")}.`;
+  const res = sc.result;
+
+  // 1. Guardar también en el historial interno de la app
+  const summary = `Zona: ${sc.zone} (${sc.side}) | ${sc.age} años, ${sc.gender}, IMC ${res.bmi} | Alineación: ${res.postureScore}/100 | Goniometría: ${res.goniometry.map(g => g.mov + " " + g.val + "°").join(", ")}.`;
   S.scans.push({
     t: Date.now(),
     zone: sc.zone + " (" + sc.side + ")",
     text: summary
   });
   save();
-  toast("Evaluación postural y goniométrica guardada en el historial");
+
+  // 2. Verificar que jsPDF esté disponible
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    toast("Preparando impresión en PDF...");
+    window.print();
+    return;
+  }
+
+  toast("📄 Descargando PDF en tu teléfono...");
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
+  const pageW = doc.internal.pageSize.getWidth();
+  let y = 15;
+
+  // Encabezado clínico
+  doc.setFillColor(16, 25, 62);
+  doc.rect(0, 0, pageW, 28, "F");
+  doc.setTextColor(0, 229, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text("PHYSIOMOTION 3D - INFORME DE ESCANER CORPORAL", 14, 13);
+  doc.setTextColor(240, 244, 255);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text(`Fecha: ${new Date().toLocaleDateString()} | Paciente: ${S.user.name || "Usuario"}`, 14, 21);
+
+  y = 36;
+
+  // Insertar la foto subida en la parte superior del PDF (convertida a JPEG compatible)
+  if (sc.img) {
+    try {
+      const imgData = await new Promise((resolve) => {
+        const im = new Image();
+        im.onload = () => {
+          const cv = document.createElement("canvas");
+          cv.width = im.naturalWidth || 600;
+          cv.height = im.naturalHeight || 800;
+          const ctx = cv.getContext("2d");
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillRect(0, 0, cv.width, cv.height);
+          ctx.drawImage(im, 0, 0);
+          resolve({
+            dataUrl: cv.toDataURL("image/jpeg", 0.88),
+            ratio: cv.width / cv.height
+          });
+        };
+        im.onerror = () => resolve(null);
+        im.src = sc.img;
+      });
+
+      if (imgData) {
+        const maxH = 70;
+        const maxW = 90;
+        let w = maxH * imgData.ratio;
+        let h = maxH;
+        if (w > maxW) {
+          w = maxW;
+          h = maxW / imgData.ratio;
+        }
+        const xCentered = (pageW - w) / 2;
+        doc.setDrawColor(0, 151, 178);
+        doc.setLineWidth(0.6);
+        doc.rect(xCentered - 1, y - 1, w + 2, h + 2);
+        doc.addImage(imgData.dataUrl, "JPEG", xCentered, y, w, h);
+        y += h + 8;
+      }
+    } catch (e) {}
+  }
+
+  // Datos Biométricos del Paciente
+  doc.setFillColor(235, 238, 250);
+  doc.rect(14, y, pageW - 28, 22, "F");
+  doc.setTextColor(23, 19, 59);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text("DATOS BIOMETRICOS Y RESUMEN FUNCIONAL", 18, y + 7);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9.5);
+  doc.text(`Edad: ${sc.age} años | Genero: ${sc.gender} | Estatura: ${sc.height} cm | Peso: ${sc.weight} kg | IMC: ${res.bmi} (${res.bmiLabel})`, 18, y + 13);
+  doc.text(`Zona evaluada: ${sc.zone} (${sc.side}) | Alineacion Postural: ${res.postureScore}/100 | Movilidad (ROM): ${res.romPct}%`, 18, y + 19);
+  y += 30;
+
+  // 1. Evaluación Postural Estimada
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(0, 139, 158);
+  doc.text("1. EVALUACION POSTURAL ESTIMADA", 14, y);
+  y += 6;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(30, 30, 30);
+  const postureLines = doc.splitTextToSize(
+    `• Plano Frontal: ${res.frontalText}\n• Plano Sagital: ${res.sagittalText}\n• Impacto Biomecanico: ${res.loadText}`,
+    pageW - 28
+  );
+  doc.text(postureLines, 14, y);
+  y += postureLines.length * 5 + 6;
+
+  // 2. Tabla de Goniometría Articular
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(0, 139, 158);
+  doc.text(`2. GONIOMETRIA ARTICULAR: ${sc.zone.toUpperCase()} (${sc.side.toUpperCase()})`, 14, y);
+  y += 6;
+
+  // Cabecera de tabla
+  doc.setFillColor(16, 25, 62);
+  doc.rect(14, y, pageW - 28, 8, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(9.5);
+  doc.text("Movimiento", 17, y + 5.5);
+  doc.text("Tu Angulo", 95, y + 5.5);
+  doc.text("Rango Normal", 128, y + 5.5);
+  doc.text("Estado", 165, y + 5.5);
+  y += 8;
+
+  // Filas de goniometría
+  doc.setFont("helvetica", "normal");
+  res.goniometry.forEach((g, i) => {
+    if (i % 2 === 0) {
+      doc.setFillColor(245, 247, 252);
+      doc.rect(14, y, pageW - 28, 8, "F");
+    }
+    doc.setTextColor(20, 20, 20);
+    doc.text(String(g.mov), 17, y + 5.5);
+    doc.setFont("helvetica", "bold");
+    doc.text(`${g.val}°`, 95, y + 5.5);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(g.norm), 128, y + 5.5);
+    doc.text(String(g.status), 165, y + 5.5);
+    y += 8;
+  });
+
+  y += 8;
+
+  // 3. Recomendación Fisioterapéutica
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(0, 139, 158);
+  doc.text("3. RECOMENDACION FISIOTERAPEUTICA", 14, y);
+  y += 6;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(30, 30, 30);
+  const recLines = doc.splitTextToSize(res.recommendation, pageW - 28);
+  doc.text(recLines, 14, y);
+  y += recLines.length * 5 + 10;
+
+  // Nota legal al pie
+  doc.setFontSize(8.5);
+  doc.setTextColor(110, 110, 110);
+  doc.text("Aviso: Evaluacion orientativa generada por PhysioMotion 3D. No sustituye el diagnostico presencial de un fisioterapeuta.", 14, 285);
+
+  // Descargar archivo PDF directamente en el teléfono
+  const fileName = `Informe_PhysioMotion3D_${sc.zone}_${new Date().toISOString().slice(0, 10)}.pdf`;
+  doc.save(fileName);
+  toast("✅ PDF guardado en tu teléfono");
 }
 
 function renderWatchTimer() {
