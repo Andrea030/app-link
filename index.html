@@ -1968,10 +1968,38 @@ function renderHome() {
   `;
 }
 
+/* ===== SINCRONIZAR "MI RUTINA PERSONALIZADA" Y EJERCICIOS PROPIOS ===== */
+function syncCustomRoutine() {
+  if (!S.myRoutineItems) {
+    S.myRoutineItems = [];
+  }
+  const existing = PRESET_ROUTINES.find(r => r.id === "personalizada");
+  const customObj = {
+    id: "personalizada",
+    title: { es: "⭐ Mi Rutina Personalizada", en: "⭐ My Custom Routine", de: "⭐ Meine eigene Routine" },
+    badge: "CREADA POR MÍ",
+    objective: "Ejercicios propios y seleccionados de la biblioteca",
+    duration: Math.max(5, S.myRoutineItems.length * 4) + " mins",
+    intensity: "Personalizada · Controlada por el usuario",
+    physioNote: "Aquí se guardan automáticamente los ejercicios que creas o agregas desde la biblioteca.",
+    items: S.myRoutineItems
+  };
+  if (existing) {
+    Object.assign(existing, customObj);
+  } else {
+    PRESET_ROUTINES.unshift(customObj);
+  }
+}
+syncCustomRoutine();
+
 /* ===== PASO 7 DEL PPT: BUSCAR UN EJERCICIO Y 6 CATEGORÍAS ===== */
 function renderLibrary() {
   const q = UI.q.trim().toLowerCase();
-  const list = allEx().filter(e => {
+  // Mostrar primero los ejercicios creados por el usuario y luego los de la app
+  const orderedEx = [...(S.customEx || []).slice().reverse(), ...EX];
+
+  const list = orderedEx.filter(e => {
+    if (UI.pptCat === "custom") return String(e.id).startsWith("custom_");
     if (UI.pptCat !== "all" && e.pptCat !== UI.pptCat) return false;
     if (q) {
       const hay = [exName(e), e.obj, ...(e.mus || []).map(m => MUSCLES[m] ? mName(MUSCLES[m]) : "")].join(" ").toLowerCase();
@@ -1984,32 +2012,41 @@ function renderLibrary() {
     <input class="search" type="search" placeholder="${t("search")}" value="${esc(UI.q)}" oninput="UI.q=this.value;render()">
     <div class="chips">
       <button class="chip ${UI.pptCat === "all" ? "on" : ""}" onclick="UI.pptCat='all';render()">${t("all")}</button>
+      <button class="chip ${UI.pptCat === "custom" ? "on" : ""}" onclick="UI.pptCat='custom';render()">⭐ Mis creados (${(S.customEx || []).length})</button>
       ${Object.entries(PPT_CATS).map(([k, v]) => `
         <button class="chip ${UI.pptCat === k ? "on" : ""}" onclick="UI.pptCat='${k}';render()">${esc(v[S.lang] || v.es)}</button>
       `).join("")}
     </div>
     <div class="row spread">
       <span class="small muted">${list.length} ejercicios disponibles en 3D</span>
-      <button class="btn sm alt" onclick="navigate('newEx')">${ic("plus", 16)} Ejercicio / Video propio</button>
+      <button class="btn sm alt" onclick="navigate('newEx')">${ic("plus", 16)} Crear ejercicio propio</button>
     </div>
     <div class="list">
-      ${list.map(e => `
-        <button class="item" onclick="navigate('exDetail','${e.id}')">
-          <span class="ico">${ic("dumbbell")}</span>
-          <span class="grow">
-            <span class="nm">${esc(exName(e))}</span><br>
-            <span class="small muted">${esc(PPT_CATS[e.pptCat]?.[S.lang] || PPT_CATS[e.pptCat]?.es || "General")} · ${esc(CT[e.ct] || "")}</span>
-          </span>
-          <span class="tag teal">Ver 3D</span>
-        </button>
-      `).join("")}
+      ${list.length ? list.map(e => {
+        const isCustom = String(e.id).startsWith("custom_");
+        return `
+          <button class="item" style="${isCustom ? "border-color:var(--accent)" : ""}" onclick="navigate('exDetail','${e.id}')">
+            <span class="ico">${ic("dumbbell")}</span>
+            <span class="grow">
+              <span class="nm">${esc(exName(e))}</span>
+              ${isCustom ? `<span class="tag warn" style="margin-left:6px">⭐ CREADO POR MÍ</span>` : ""}<br>
+              <span class="small muted">${esc(PPT_CATS[e.pptCat]?.[S.lang] || PPT_CATS[e.pptCat]?.es || "General")} · ${esc(CT[e.ct] || "")}</span>
+            </span>
+            <span class="tag teal">Ver 3D</span>
+          </button>
+        `;
+      }).join("") : `<div class="card muted">No hay ejercicios en este filtro todavía.</div>`}
     </div>
   `;
 }
 
 /* ===== PASO 8 DEL PPT: VISUALIZACIÓN 3D DEL MOVIMIENTO ===== */
 function renderExDetail(id) {
+  syncCustomRoutine();
   const e = getEx(id);
+  const isCustom = String(e.id).startsWith("custom_");
+  const inMyRoutine = (S.myRoutineItems || []).some(it => it.ex === e.id);
+
   return `
     <div class="stage">
       <div class="hud-top">
@@ -2027,6 +2064,18 @@ function renderExDetail(id) {
         <button class="chip" onclick="toggleViewerPlay()">⏯ Pausar/Reproducir</button>
         <button class="chip" onclick="toggleViewerSpin()">🔄 ${t("spin")}</button>
       </div>
+    </div>
+
+    <!-- BOTÓN DIRECTO PARA GUARDAR Y VER EN MIS RUTINAS -->
+    <div class="row wrap">
+      <button class="btn ${inMyRoutine ? "purple" : ""} block" onclick="addExToCustomRoutine('${e.id}')">
+        ${inMyRoutine ? "✓ Guardado en Mi Rutina Personalizada (Ver en Mis Rutinas)" : "+ Añadir a Mi Rutina Personalizada"}
+      </button>
+      ${isCustom ? `
+        <button class="btn danger sm block" onclick="deleteCustomEx('${e.id}')">
+          🗑️ Eliminar este ejercicio creado
+        </button>
+      ` : ""}
     </div>
 
     <div class="card neon">
@@ -2135,7 +2184,7 @@ function renderNewEx() {
           <select id="cx_mus">${Object.entries(MUSCLES).map(([k, m]) => `<option value="${k}">${m.n.es}</option>`).join("")}</select>
         </label>
         <label class="f">Instrucciones (una por línea)<textarea id="cx_steps" placeholder="Paso 1...\nPaso 2..."></textarea></label>
-        <button type="submit" class="btn block">Guardar en la biblioteca</button>
+        <button type="submit" class="btn block">Guardar en Biblioteca y en Mi Rutina</button>
       </form>
     </div>
   `;
@@ -2145,23 +2194,55 @@ function saveCustomEx(e) {
   e.preventDefault();
   const name = document.getElementById("cx_name").value.trim();
   const id = "custom_" + Date.now();
-  S.customEx.push({
+  const ctVal = document.getElementById("cx_ct").value;
+  const newExercise = {
     id, n: { es: name, en: name, de: name },
     pptCat: document.getElementById("cx_cat").value,
-    cat: "fuerza", ct: document.getElementById("cx_ct").value,
+    cat: "fuerza", ct: ctVal,
     mus: [document.getElementById("cx_mus").value],
     pose: { A: { s: 10 }, B: { s: 85 }, spd: 0.4 },
     initPos: "Posición inicial controlada.", finalPos: "Rango completo sin dolor.", dirMov: "Ejecución lenta.",
     obj: "Ejercicio personalizado añadido por el usuario.",
     steps: document.getElementById("cx_steps").value.split("\n").filter(Boolean)
+  };
+  S.customEx.push(newExercise);
+
+  // Agregarlo automáticamente a "Mi Rutina Personalizada"
+  syncCustomRoutine();
+  S.myRoutineItems.push({
+    ex: id,
+    sets: 3,
+    reps: ctVal === "iso" ? 0 : 10,
+    hold: ctVal === "iso" ? 30 : 0,
+    rest: 60,
+    unit: ctVal === "iso" ? "s" : "rep",
+    note: "Ejercicio creado por el usuario."
   });
+  S.activeRoutineId = "personalizada";
+  UI.routineId = "personalizada";
   save();
-  toast("Ejercicio agregado");
-  navigate("exDetail", id);
+
+  // Hacer que al tocar la flecha '<' regrese directo a la lista de Ejercicios (y no al formulario vacío)
+  UI.stack = [{ screen: "lib", param: null }];
+  UI.pptCat = "all";
+  UI.screen = "exDetail";
+  UI.param = id;
+  toast("✅ Guardado en «Ejercicios» y en «Mi Rutina Personalizada»");
+  render();
+}
+
+function deleteCustomEx(id) {
+  S.customEx = (S.customEx || []).filter(x => x.id !== id);
+  S.myRoutineItems = (S.myRoutineItems || []).filter(x => x.ex !== id);
+  syncCustomRoutine();
+  save();
+  toast("Ejercicio eliminado");
+  switchTab("lib");
 }
 
 /* ===== PASO 9 DEL PPT: ACCEDER A "MIS RUTINAS" ===== */
 function renderRoutines() {
+  syncCustomRoutine();
   const curR = PRESET_ROUTINES.find(r => r.id === UI.routineId) || PRESET_ROUTINES[0];
   return `
     <div class="card flat">
@@ -2172,15 +2253,15 @@ function renderRoutines() {
       ${PRESET_ROUTINES.map(r => `
         <div class="card ${UI.routineId === r.id ? "neon" : ""}">
           <div class="row spread">
-            <span class="tag teal">${esc(r.badge)}</span>
-            <span class="small muted">⏱ ${esc(r.duration)}</span>
+            <span class="tag ${r.id === "personalizada" ? "warn" : "teal"}">${esc(r.badge)}</span>
+            <span class="small muted">⏱ ${esc(r.duration)} · ${r.items.length} ejerc.</span>
           </div>
           <h2 style="margin-top:6px">${esc(r.title[S.lang] || r.title.es)}</h2>
           <p class="small" style="margin-top:4px"><b>Objetivo terapéutico:</b> ${esc(r.objective)}</p>
           <p class="small muted" style="margin-top:2px"><b>Intensidad:</b> ${esc(r.intensity)}</p>
           <div class="row wrap" style="margin-top:10px">
             <button class="btn sm" onclick="UI.routineId='${r.id}';S.activeRoutineId='${r.id}';save();render()">${t("viewRoutine")}</button>
-            <button class="btn sm purple" onclick="startRoutineSession('${r.id}')">${ic("play", 16)} ${t("startSession")}</button>
+            <button class="btn sm purple" ${r.items.length ? "" : "disabled"} onclick="startRoutineSession('${r.id}')">${ic("play", 16)} ${t("startSession")}</button>
           </div>
         </div>
       `).join("")}
@@ -2190,30 +2271,68 @@ function renderRoutines() {
       <h2>Detalle: ${esc(curR.title[S.lang] || curR.title.es)}</h2>
       <p class="small muted" style="margin-top:4px"><b>Observación clínica:</b> ${esc(curR.physioNote)}</p>
       <div class="list" style="margin-top:12px">
-        ${curR.items.map((it, idx) => {
+        ${curR.items.length ? curR.items.map((it, idx) => {
           const ex = getEx(it.ex);
           return `
             <div class="card flat">
               <div class="row spread">
                 <b>${idx + 1}. ${esc(exName(ex))}</b>
-                <button class="chip" onclick="navigate('exDetail','${ex.id}')">Ver en 3D</button>
+                <div class="row" style="gap:6px">
+                  <button class="chip" onclick="navigate('exDetail','${ex.id}')">Ver en 3D</button>
+                  ${curR.id === "personalizada" ? `<button class="chip" onclick="removeExFromMyRoutine(${idx})">✕</button>` : ""}
+                </div>
               </div>
               <div class="small" style="margin-top:6px;color:var(--accent);font-weight:800">
                 Series: ${it.sets} | ${it.unit === "s" ? "Tiempo: " + it.hold + "s" : "Repeticiones: " + it.reps} | Descanso: ${it.rest}s
               </div>
               <p class="small muted" style="margin-top:4px">Ejecución: ${esc(it.note)}</p>
             </div>`;
-        }).join("")}
+        }).join("") : `
+          <div class="card flat muted">
+            Aún no has agregado ejercicios a tu rutina personalizada. Ve a «Ejercicios» y crea uno o presiona «+ Añadir a Mi Rutina Personalizada».
+          </div>
+        `}
       </div>
-      <button class="btn block" style="margin-top:12px" onclick="startRoutineSession('${curR.id}')">${ic("play", 18)} ${t("startSession")}</button>
+      <button class="btn block" style="margin-top:12px" ${curR.items.length ? "" : "disabled"} onclick="startRoutineSession('${curR.id}')">${ic("play", 18)} ${t("startSession")}</button>
     </div>
   `;
 }
 
 function addExToCustomRoutine(exId) {
-  PRESET_ROUTINES[0].items.push({ ex: exId, sets: 3, reps: 10, hold: 0, rest: 60, unit: "rep", note: "Agregado desde la biblioteca." });
-  toast("Añadido a tu rutina activa");
+  syncCustomRoutine();
+  const exists = S.myRoutineItems.some(it => it.ex === exId);
+  if (exists) {
+    UI.routineId = "personalizada";
+    S.activeRoutineId = "personalizada";
+    save();
+    switchTab("routines");
+    return;
+  }
+  const ex = getEx(exId);
+  S.myRoutineItems.push({
+    ex: exId,
+    sets: 3,
+    reps: ex.ct === "iso" ? 0 : 10,
+    hold: ex.ct === "iso" ? 30 : 0,
+    rest: 60,
+    unit: ex.ct === "iso" ? "s" : "rep",
+    note: "Agregado por el usuario desde la biblioteca."
+  });
+  UI.routineId = "personalizada";
+  S.activeRoutineId = "personalizada";
+  syncCustomRoutine();
+  save();
+  toast("✅ Guardado en «⭐ Mi Rutina Personalizada»");
+  render();
 }
+
+function removeExFromMyRoutine(idx) {
+  S.myRoutineItems.splice(idx, 1);
+  syncCustomRoutine();
+  save();
+  render();
+}
+
 
 /* ===== PASO 10 DEL PPT: EJECUTAR MI RUTINA (CON MODELO 3D, CONTADOR 08 REPS Y TEMPORIZADOR 60S) ===== */
 let execInterval = null;
