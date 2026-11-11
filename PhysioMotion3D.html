@@ -1,0 +1,3245 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>PhysioMotion 3D — Movimiento & Rehabilitación</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root[data-theme="dark"] {
+    --bg: #070B1E;
+    --bg-grad: radial-gradient(circle at 50% 0%, #132257 0%, #070B1E 70%);
+    --surface: #10193E;
+    --surface2: #192558;
+    --ink: #F0F4FF;
+    --muted: #9BA8D9;
+    --line: #26387A;
+    --accent: #00E5FF;
+    --accent-ink: #04122C;
+    --purple: #6C4DFF;
+    --purple-ink: #FFFFFF;
+    --teal: #18E0C8;
+    --teal-soft: rgba(24, 224, 200, 0.14);
+    --warn: #FFB46E;
+    --warn-soft: rgba(255, 180, 110, 0.15);
+    --danger: #FF7B72;
+    --danger-soft: rgba(255, 123, 114, 0.16);
+    --ok: #5CE69B;
+    --ok-soft: rgba(92, 230, 155, 0.15);
+    --fig: #7E8CE0;
+    --hl: #FF4D4D;
+    color-scheme: dark;
+    }
+
+    :root[data-theme="light"] {
+    --bg: #F3F4FB;
+    --bg-grad: linear-gradient(180deg, #ECE9FC 0%, #F3F4FB 100%);
+    --surface: #FFFFFF;
+    --surface2: #E6E4F7;
+    --ink: #17133B;
+    --muted: #585482;
+    --line: #D4D0EE;
+    --accent: #008B9E;
+    --accent-ink: #FFFFFF;
+    --purple: #5B3FD0;
+    --purple-ink: #FFFFFF;
+    --teal: #0B8F85;
+    --teal-soft: #D6F3F0;
+    --warn: #9A3A08;
+    --warn-soft: #FFE9DB;
+    --danger: #A8231B;
+    --danger-soft: #FDE4E1;
+    --ok: #12713F;
+    --ok-soft: #DDF5E7;
+    --fig: #7B70D8;
+    --hl: #D93832;
+    color-scheme: light;
+    }
+
+    :root {
+    --fs: 16px;
+    --font-d: "Fredoka", "Nunito", system-ui, sans-serif;
+    --font-b: "Nunito", system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+    box-sizing: border-box;
+    }
+
+    html {
+    font-size: var(--fs);
+    -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+    margin: 0;
+    background: var(--bg);
+    background-image: var(--bg-grad);
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: var(--font-b);
+    line-height: 1.45;
+    padding-left: max(14px, env(safe-area-inset-left, 0px));
+    padding-right: max(14px, env(safe-area-inset-right, 0px));
+    }
+
+    button, input, select, textarea {
+    font: inherit;
+    color: inherit;
+    }
+
+    h1, h2, h3, h4 {
+    font-family: var(--font-d);
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.2;
+    }
+
+    h1 { font-size: 1.55rem; }
+    h2 { font-size: 1.2rem; }
+    h3 { font-size: 1.05rem; }
+    p { margin: 0; }
+
+    .app-shell {
+    max-width: 540px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+    }
+
+    @media (min-width: 860px) {
+    .app-shell {
+        max-width: 780px;
+    }
+    }
+
+    .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    background: rgba(16, 25, 62, 0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 6px;
+    margin: 0 -6px 12px;
+    }
+
+    :root[data-theme="light"] .topbar {
+    background: rgba(255, 255, 255, 0.9);
+    }
+
+    .topbar h1 {
+    flex: 1;
+    font-size: 1.18rem;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    }
+
+    .iconbtn {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 12px;
+    min-width: 42px;
+    height: 42px;
+    display: inline-grid;
+    place-items: center;
+    cursor: pointer;
+    padding: 0 10px;
+    font-weight: 800;
+    transition: transform 0.12s ease, border-color 0.15s ease;
+    }
+
+    .iconbtn:hover {
+    border-color: var(--accent);
+    }
+
+    .iconbtn:active {
+    transform: scale(0.96);
+    }
+
+    .view {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    }
+
+    .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    }
+
+    .card.flat {
+    background: var(--surface2);
+    border-color: transparent;
+    box-shadow: none;
+    }
+
+    .card.neon {
+    border-color: var(--accent);
+    box-shadow: 0 0 18px rgba(0, 229, 255, 0.15);
+    }
+
+    .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 18px;
+    border-radius: 14px;
+    border: 2px solid var(--accent);
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 800;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.12s ease, opacity 0.15s ease;
+    }
+
+    .btn:active {
+    transform: scale(0.98);
+    }
+
+    .btn.purple {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: var(--purple-ink);
+    }
+
+    .btn.alt {
+    background: transparent;
+    color: var(--accent);
+    border-color: var(--accent);
+    }
+
+    .btn.ghost {
+    background: var(--surface2);
+    border-color: var(--line);
+    color: var(--ink);
+    }
+
+    .btn.danger {
+    background: transparent;
+    color: var(--danger);
+    border-color: var(--danger);
+    }
+
+    .btn.sm {
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 0.86rem;
+    border-radius: 10px;
+    }
+
+    .btn.block {
+    width: 100%;
+    }
+
+    .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    }
+
+    .row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    }
+
+    .row.wrap {
+    flex-wrap: wrap;
+    }
+
+    .spread {
+    justify-content: space-between;
+    }
+
+    .muted {
+    color: var(--muted);
+    }
+
+    .small {
+    font-size: 0.85rem;
+    }
+
+    .chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    }
+
+    .chip {
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 6px 13px;
+    min-height: 36px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    }
+
+    .chip.on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    }
+
+    .chip.static {
+    cursor: default;
+    }
+
+    .tag {
+    font-size: 0.72rem;
+    font-weight: 800;
+    border-radius: 8px;
+    padding: 3px 8px;
+    background: var(--surface2);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: inline-block;
+    }
+
+    .tag.teal {
+    background: var(--teal-soft);
+    color: var(--teal);
+    }
+
+    .tag.warn {
+    background: var(--warn-soft);
+    color: var(--warn);
+    }
+
+    .hero {
+    background: linear-gradient(135deg, #5B3FD0 0%, #0097B2 100%);
+    color: #FFFFFF;
+    border-radius: 22px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid rgba(0, 229, 255, 0.35);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    .grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    }
+
+    .grid4 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    }
+
+    @media (min-width: 520px) {
+    .grid4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    }
+
+    .tile {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+    cursor: pointer;
+    min-height: 98px;
+    transition: border-color 0.15s ease, transform 0.12s ease;
+    }
+
+    .tile:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    }
+
+    .tile .ico {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: var(--teal-soft);
+    color: var(--teal);
+    }
+
+    .list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    }
+
+    .item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    padding: 12px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    transition: border-color 0.15s ease;
+    }
+
+    .item:hover {
+    border-color: var(--accent);
+    }
+
+    .item .grow {
+    flex: 1;
+    min-width: 0;
+    }
+
+    .item .ico {
+    flex: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: var(--surface2);
+    display: grid;
+    place-items: center;
+    color: var(--accent);
+    }
+
+    .item .nm {
+    font-weight: 800;
+    }
+
+    .search {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+    padding: 0 14px;
+    }
+
+    label.f {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+    width: 100%;
+    min-height: 46px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+    padding: 8px 12px;
+    }
+
+    textarea {
+    min-height: 86px;
+    resize: vertical;
+    }
+
+    input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    min-height: 34px;
+    }
+
+    .stage {
+    position: relative;
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: 20px;
+    overflow: hidden;
+    }
+
+    .stage canvas {
+    display: block;
+    width: 100%;
+    height: 290px;
+    touch-action: pan-y;
+    cursor: grab;
+    }
+
+    .stage .hud-top {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    pointer-events: none;
+    flex-wrap: wrap;
+    }
+
+    .stage .badge3d {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: var(--ink);
+    background: rgba(16, 25, 62, 0.82);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 4px 9px;
+    }
+
+    :root[data-theme="light"] .stage .badge3d {
+    background: rgba(255, 255, 255, 0.88);
+    }
+
+    .stage .bar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 9px;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+    justify-content: center;
+    }
+
+    .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface2);
+    border-radius: 14px;
+    padding: 4px;
+    overflow-x: auto;
+    }
+
+    .tabs button {
+    flex: 1;
+    min-height: 40px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-weight: 800;
+    cursor: pointer;
+    font-size: 0.82rem;
+    padding: 0 8px;
+    white-space: nowrap;
+    }
+
+    .tabs button.on {
+    background: var(--surface);
+    color: var(--accent);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 25;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    padding: 6px max(8px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-right, 0px));
+    }
+
+    .tabbar nav {
+    max-width: 640px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    }
+
+    .tabbar button {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 54px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.7rem;
+    cursor: pointer;
+    padding: 4px 2px;
+    }
+
+    .tabbar button.on {
+    color: var(--accent);
+    background: var(--surface2);
+    }
+
+    .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--surface2);
+    border-radius: 14px;
+    padding: 12px;
+    }
+
+    .stat b {
+    font-family: var(--font-d);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--accent);
+    }
+
+    .stat span {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 700;
+    }
+
+    .alert {
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    }
+
+    .alert.warn { background: var(--warn-soft); color: var(--warn); }
+    .alert.danger { background: var(--danger-soft); color: var(--danger); }
+    .alert.ok { background: var(--ok-soft); color: var(--ok); }
+    .alert.info { background: var(--teal-soft); color: var(--ink); }
+
+    .steps {
+    margin: 0;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    }
+
+    ul.dots {
+    margin: 0;
+    padding-left: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    }
+
+    .bodymap {
+    display: grid;
+    grid-template-columns: 145px 1fr;
+    gap: 14px;
+    align-items: center;
+    }
+
+    @media (max-width: 400px) {
+    .bodymap {
+        grid-template-columns: 1fr;
+    }
+    }
+
+    .bodymap svg {
+    width: 100%;
+    max-height: 290px;
+    }
+
+    .bodymap .rg {
+    fill: var(--surface2);
+    stroke: var(--accent);
+    stroke-width: 1;
+    cursor: pointer;
+    transition: fill 0.15s;
+    }
+
+    .bodymap .rg:hover,
+    .bodymap .rg.on {
+    fill: var(--hl);
+    }
+
+    .bodymap .hd {
+    fill: var(--surface2);
+    stroke: var(--line);
+    }
+
+    .ring {
+    --p: 0;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: conic-gradient(var(--accent) calc(var(--p) * 1%), var(--surface2) 0);
+    display: grid;
+    place-items: center;
+    margin: 0 auto;
+    }
+
+    .ring > div {
+    width: 148px;
+    height: 148px;
+    border-radius: 50%;
+    background: var(--surface);
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 8px;
+    }
+
+    .ring b {
+    font-family: var(--font-d);
+    font-size: 2.35rem;
+    line-height: 1;
+    }
+
+    .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 110px;
+    }
+
+    .bars div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    height: 100%;
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 700;
+    }
+
+    .bars i {
+    display: block;
+    width: 100%;
+    border-radius: 8px 8px 4px 4px;
+    background: var(--accent);
+    min-height: 4px;
+    }
+
+    .bars i.zero {
+    background: var(--surface2);
+    }
+
+    .medal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+    padding: 10px 6px;
+    border-radius: 14px;
+    background: var(--surface2);
+    font-size: 0.76rem;
+    font-weight: 800;
+    }
+
+    .medal.off {
+    opacity: 0.4;
+    filter: grayscale(1);
+    }
+
+    .scancv {
+    width: 100%;
+    border-radius: 14px;
+    touch-action: none;
+    background: var(--surface2);
+    display: block;
+    }
+
+    table.tb {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+    }
+
+    table.tb th, table.tb td {
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    }
+
+    table.tb th {
+    color: var(--muted);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    }
+
+    details.acc {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0 14px;
+    }
+
+    details.acc summary {
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    font-weight: 800;
+    cursor: pointer;
+    list-style: none;
+    justify-content: space-between;
+    gap: 8px;
+    }
+
+    details.acc summary::-webkit-details-marker {
+    display: none;
+    }
+
+    details.acc[open] summary {
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 10px;
+    }
+
+    details.acc > div {
+    padding-bottom: 12px;
+    }
+
+    .check {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    min-height: 40px;
+    cursor: pointer;
+    }
+
+    .check input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--accent);
+    flex: none;
+    }
+
+    .avatar-box {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 2px solid var(--accent);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    flex: none;
+    }
+
+    .avatar-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    }
+
+    .toast {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    background: var(--accent);
+    color: var(--accent-ink);
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 800;
+    z-index: 80;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .auth-hero {
+    text-align: center;
+    padding: 28px 18px;
+    border-radius: 24px;
+    background: linear-gradient(160deg, #132257 0%, #09112E 100%);
+    border: 1.5px solid var(--accent);
+    box-shadow: 0 0 28px rgba(0, 229, 255, 0.16);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell" id="app"></div>
+  <script>
+        /* ===== DICCIONARIO MULTILINGÜE (PASO 5 DEL PPT) ===== */
+    const I18N = {
+    es: {
+        home: "Inicio", lib: "Ejercicios", routines: "Mis rutinas", progress: "Mi progreso",
+        anatomy: "Anatomía 3D", edu: "Educación", profile: "Perfil", pro: "Profesional",
+        tagline: "Movimiento & Rehabilitación en 3D", welcomeSub: "Comprende el movimiento, realiza tus ejercicios y acompaña tu progreso.",
+        login: "Iniciar sesión", register: "Crear cuenta", enter: "Ingresar", registerBtn: "Registrarme",
+        forgot: "¿Olvidaste tu contraseña?", logout: "Cerrar sesión",
+        search: "Buscar ejercicio o músculo...", all: "Todas",
+        steps: "Ejecución", dosing: "Dosificación", videos: "Mis videos", safety: "Seguridad", sources: "Fuentes",
+        front: "Frente", side: "Lado", back_: "Espalda", spin: "Giro 360°",
+        startSession: "Comenzar sesión", nextEx: "Siguiente ejercicio", logSession: "Registrar mi actividad",
+        saveChanges: "Guardar cambios", saveRecord: "Guardar registro", viewRoutine: "Ver rutina",
+        doseCalc: "Calculadora de Dosis", scanner: "Escáner Corporal", timer: "Modo Reloj", routes: "Rutas por Paciente"
+    },
+    en: {
+        home: "Home", lib: "Exercises", routines: "My Routines", progress: "My Progress",
+        anatomy: "3D Anatomy", edu: "Education", profile: "Profile", pro: "Professional",
+        tagline: "3D Movement & Rehabilitation", welcomeSub: "Understand movement, perform your exercises, and track your progress.",
+        login: "Sign In", register: "Create Account", enter: "Sign In", registerBtn: "Register",
+        forgot: "Forgot your password?", logout: "Sign Out",
+        search: "Search exercise or muscle...", all: "All",
+        steps: "Instructions", dosing: "Dosage", videos: "My Videos", safety: "Safety", sources: "Sources",
+        front: "Front", side: "Side", back_: "Back", spin: "360° Spin",
+        startSession: "Start Session", nextEx: "Next Exercise", logSession: "Log My Activity",
+        saveChanges: "Save Changes", saveRecord: "Save Record", viewRoutine: "View Routine",
+        doseCalc: "Dosage Calculator", scanner: "Body Scanner", timer: "Watch Mode", routes: "Patient Routes"
+    },
+    de: {
+        home: "Start", lib: "Übungen", routines: "Meine Routinen", progress: "Fortschritt",
+        anatomy: "3D-Anatomie", edu: "Bildung", profile: "Profil", pro: "Therapeut",
+        tagline: "3D-Bewegung & Rehabilitation", welcomeSub: "Bewegung verstehen, Übungen ausführen und Fortschritte verfolgen.",
+        login: "Anmelden", register: "Konto erstellen", enter: "Einloggen", registerBtn: "Registrieren",
+        forgot: "Passwort vergessen?", logout: "Abmelden",
+        search: "Übung oder Muskel suchen...", all: "Alle",
+        steps: "Ausführung", dosing: "Dosierung", videos: "Meine Videos", safety: "Sicherheit", sources: "Quellen",
+        front: "Vorne", side: "Seite", back_: "Rücken", spin: "360°-Drehung",
+        startSession: "Einheit starten", nextEx: "Nächste Übung", logSession: "Aktivität erfassen",
+        saveChanges: "Änderungen speichern", saveRecord: "Eintrag speichern", viewRoutine: "Routine ansehen",
+        doseCalc: "Dosierungsrechner", scanner: "Körperscanner", timer: "Uhrmodus", routes: "Patientenpfade"
+    }
+    };
+
+    /* ===== 6 CATEGORÍAS OFICIALES (PASO 7 DEL PPT Y ARCHIVOS VS CODE) ===== */
+    const PPT_CATS = {
+    movilidad: { es: "Movilidad articular", en: "Joint Mobility", de: "Gelenkmobilität", file: "movilidad.html" },
+    fortalecimiento: { es: "Fortalecimiento muscular", en: "Muscle Strengthening", de: "Muskelkräftigung", file: "fortalecimiento.html" },
+    isometricos: { es: "Ejercicios isométricos", en: "Isometric Exercises", de: "Isometrische Übungen", file: "isometricos.html" },
+    concentricos: { es: "Concéntricos / Excéntricos", en: "Concentric / Eccentric", de: "Konzentrisch / Exzentrisch", file: "concentricos.html" },
+    equilibrio: { es: "Equilibrio y propiocepción", en: "Balance & Proprioception", de: "Gleichgewicht & Propriozeption", file: "equilibrio.html" },
+    coordinacion: { es: "Coordinación y control motor", en: "Coordination & Motor Control", de: "Koordination & Motorik", file: "coordinacion.html" }
+    };
+
+    /* ===== 6 OBJETIVOS DEL PERFIL (PASO 4 DEL PPT) ===== */
+    const PPT_OBJECTIVES = [
+    "1. Mejorar la movilidad",
+    "2. Desarrollar fuerza",
+    "3. Mejorar el equilibrio",
+    "4. Mejorar coordinación",
+    "5. Entrenamiento deportivo",
+    "6. Programa fisioterapéutico"
+    ];
+
+    const CT = { exc: "Excéntrico", con: "Concéntrico", iso: "Isométrico", dyn: "Dinámico (Conc./Exc.)", mov: "Movilidad controlada" };
+    const GROUPS = { infantil: "Infantil", adulto: "Adulto", mayor: "Adulto mayor", deportista: "Deportista", lesionado: "Lesionado", especial: "Condición especial" };
+    const REGIONS = { hombro: "Hombro", pecho: "Pecho", brazo: "Brazo", espalda: "Espalda", core: "Core", cadera: "Cadera", muslo: "Muslo", pierna: "Pierna" };
+
+    /* ===== 19 MÚSCULOS ANATÓMICOS EN 3D ===== */
+    const MUSCLES = {
+    quad: { n: { es: "Cuádriceps", en: "Quadriceps", de: "Quadrizeps" }, reg: "muslo", seg: ["thighL", "thighR"], loc: "Parte anterior del muslo", fn: "Extiende la rodilla y frena el descenso al sentarse o bajar escaleras.", str: "De pie, lleva el talón al glúteo y sostén 30 s por lado.", note: "Clave en la sentadilla hacia la silla." },
+    ham: { n: { es: "Isquiotibiales", en: "Hamstrings", de: "Ischiocrurale Muskeln" }, reg: "muslo", seg: ["thighL", "thighR"], loc: "Parte posterior del muslo", fn: "Flexionan la rodilla y extienden la cadera.", str: "Pierna adelantada con talón apoyado, inclina el tronco 30 s.", note: "El trabajo excéntrico previene desgarros." },
+    glutmax: { n: { es: "Glúteo mayor", en: "Gluteus maximus", de: "Großer Gesäßmuskel" }, reg: "cadera", seg: ["pelvis"], loc: "Región posterior de la cadera", fn: "Extiende la cadera con potencia para levantarse, subir y saltar.", str: "Acostado, lleva una rodilla al pecho 30 s.", note: "Fundamental en el puente de glúteos y sentadilla." },
+    glutmed: { n: { es: "Glúteo medio", en: "Gluteus medius", de: "Mittlerer Gesäßmuskel" }, reg: "cadera", seg: ["pelvis", "thighL", "thighR"], loc: "Cara lateral de la cadera", fn: "Estabiliza la pelvis al caminar y al sostenerse en un solo pie.", str: "Cruza una pierna por detrás e inclina el tronco 30 s.", note: "Indispensable en rehabilitación de cadera y tobillo." },
+    calf: { n: { es: "Gemelos y sóleo (Tríceps sural)", en: "Calf (Gastrocnemius & Soleus)", de: "Wadenmuskulatur" }, reg: "pierna", seg: ["shinL", "shinR"], loc: "Parte posterior de la pierna", fn: "Impulsan el pie hacia abajo (flexión plantar) y estabilizan el tobillo.", str: "Manos en la pared, talón atrasado apoyado 30 s.", note: "Protagonista en la elevación y descenso de talones." },
+    tibant: { n: { es: "Tibial anterior", en: "Tibialis anterior", de: "Vorderer Schienbeinmuskel" }, reg: "pierna", seg: ["shinL", "shinR"], loc: "Parte frontal de la pierna", fn: "Levanta la punta del pie (dorsiflexión) evitando tropiezos.", str: "Apoya el empeine atrás y estira suavemente 20 s.", note: "Esencial en esguinces y rehabilitación de tobillo." },
+    addu: { n: { es: "Aductores", en: "Adductors", de: "Adduktoren" }, reg: "muslo", seg: ["thighL", "thighR"], loc: "Cara interna del muslo", fn: "Aproximan las piernas y estabilizan la pelvis.", str: "Sentado planta con planta, deja bajar las rodillas 30 s.", note: "Controlan la alineación del miembro inferior." },
+    hipflex: { n: { es: "Psoas ilíaco (Flexores de cadera)", en: "Hip Flexors", de: "Hüftbeuger" }, reg: "cadera", seg: ["pelvis", "thighL", "thighR"], loc: "Cara anterior de la cadera", fn: "Eleva el muslo hacia el abdomen al caminar o marchar.", str: "Zancada con rodilla en el suelo, avanza la pelvis 30 s.", note: "Se acorta al pasar muchas horas sentado." },
+    rect: { n: { es: "Recto abdominal", en: "Rectus abdominis", de: "Gerader Bauchmuskel" }, reg: "core", seg: ["torsoLow"], loc: "Frente del abdomen", fn: "Flexiona el tronco y estabiliza la caja torácica.", str: "Apoyo suave en antebrazos boca abajo 20 s.", note: "Trabaja en sinergia con el core profundo." },
+    core: { n: { es: "Transverso y oblicuos (Core)", en: "Deep Core & Obliques", de: "Tiefe Bauchmuskulatur" }, reg: "core", seg: ["torsoLow", "pelvis"], loc: "Faja abdominal profunda", fn: "Estabiliza la columna lumbar antes de mover brazos o piernas.", str: "Inclinación lateral suave de pie 20 s.", note: "Se activa con la exhalación controlada." },
+    erector: { n: { es: "Erectores espinales", en: "Erector spinae", de: "Rückenstrecker" }, reg: "espalda", seg: ["torsoUp", "torsoLow"], loc: "A lo largo de la columna", fn: "Mantienen la columna erguida y controlada.", str: "Posición mahometana o del niño durante 30 s.", note: "Protegen la espalda en bisagras de cadera." },
+    lats: { n: { es: "Dorsal ancho", en: "Latissimus dorsi", de: "Breiter Rückenmuskel" }, reg: "espalda", seg: ["torsoUp", "uarmL", "uarmR"], loc: "Espalda media y baja", fn: "Tracciona el brazo hacia atrás y abajo.", str: "Sujeta un marco y lleva la cadera atrás 30 s.", note: "Motor principal en el remo con banda." },
+    trap: { n: { es: "Trapecio y romboides", en: "Trapezius & Rhomboids", de: "Trapezius & Rhomboideen" }, reg: "espalda", seg: ["shoulders", "torsoUp"], loc: "Cuello y zona interescapular", fn: "Estabilizan y retraen los omóplatos.", str: "Inclina la oreja hacia el hombro 20 s por lado.", note: "Claves en la rehabilitación postural y de hombro." },
+    delt: { n: { es: "Deltoides", en: "Deltoid", de: "Deltamuskel" }, reg: "hombro", seg: ["shoulders", "uarmL", "uarmR"], loc: "Contorno del hombro", fn: "Eleva el brazo en plano frontal, lateral y posterior.", str: "Cruza el brazo frente al pecho 20 s.", note: "Trabaja en todas las elevaciones de hombro." },
+    cuff: { n: { es: "Manguito rotador", en: "Rotator Cuff", de: "Rotatorenmanschette" }, reg: "hombro", seg: ["shoulders"], loc: "Profundo en la escápula y hombro", fn: "Centra la cabeza humeral y da estabilidad dinámica al hombro.", str: "Rotación suave con toalla tras la espalda 20 s.", note: "Foco principal de la Rutina de Hombro." },
+    pec: { n: { es: "Pectoral mayor", en: "Pectoralis major", de: "Großer Brustmuskel" }, reg: "pecho", seg: ["torsoUp"], loc: "Cara anterior del tórax", fn: "Empuja y aproxima los brazos hacia el centro.", str: "Antebrazo en marco de puerta, gira el tronco 30 s.", note: "Estirarlo mejora la postura cifótica." },
+    biceps: { n: { es: "Bíceps braquial", en: "Biceps brachii", de: "Bizeps" }, reg: "brazo", seg: ["uarmL", "uarmR"], loc: "Parte frontal del brazo", fn: "Flexiona el codo y supina el antebrazo.", str: "Extiende el brazo hacia atrás apoyado en pared 20 s.", note: "Activo en curls y remos." },
+    triceps: { n: { es: "Tríceps braquial", en: "Triceps brachii", de: "Trizeps" }, reg: "brazo", seg: ["uarmL", "uarmR"], loc: "Parte posterior del brazo", fn: "Extiende el codo y ayuda a incorporarse de una silla.", str: "Codo arriba y mano tras la nuca 20 s.", note: "Antagonista del bíceps." },
+    diaph: { n: { es: "Diafragma e intercostales", en: "Diaphragm & Intercostals", de: "Zwerchfell" }, reg: "core", seg: ["torsoUp", "torsoLow"], loc: "Base de la parrilla costal", fn: "Músculo principal de la respiración profunda y regulación autonómica.", str: "Expansión costal lenta con manos en las costillas.", note: "Trabaja en la respiración diafragmática." }
+    };
+
+    /* ===== BIBLIOTECA INTEGRADA DE EJERCICIOS (PPT + VS CODE + HTML 3) ===== */
+    const EX = [
+    { id: "sts", n: { es: "Sentadilla a silla (3D)", en: "Chair Squat (Sit-to-Stand)", de: "Stuhl-Kniebeuge" }, pptCat: "fortalecimiento", cat: "fuerza", ct: "dyn", mus: ["quad", "glutmax", "core"], lvl: 1, grp: ["mayor", "adulto", "lesionado", "especial"],
+        pose: { A: { h: 88, k: 90, t: 16, s: 65 }, B: { h: 0, k: 0, t: 0, s: 0 }, chair: 1, spd: 0.4 },
+        initPos: "Sentado al borde de la silla, pies firmes al ancho de caderas, brazos al frente.",
+        finalPos: "De pie erguido con extensión completa controlada de rodillas y cadera.",
+        dirMov: "Ascenso vertical (fase concéntrica) y descenso controlado hacia la silla (fase excéntrica).",
+        obj: "Desarrollar fuerza funcional en miembros inferiores y control del descenso (Ejemplo oficial Paso 7 y 10 del PPT).",
+        steps: ["Siéntate en el borde de una silla firme con los pies apoyados.", "Inclina ligeramente el tronco y sube empujando el suelo con las piernas.", "Extiende cadera y rodillas sin bloquear de golpe.", "Desciende de forma controlada en 3 segundos hasta tocar la silla."],
+        err: ["Dejarse caer sobre la silla", "Juntar las rodillas hacia adentro (valgo)"], contra: ["Dolor agudo de rodilla o cadera sin autorización"],
+        easy: "Usar silla más alta o apoyarse en los reposabrazos.", hard: "Pausa de 3 segundos rozando la silla sin sentarse.", breath: "Inhala al bajar, exhala al subir." },
+
+    { id: "hr", n: { es: "Elevación de talones", en: "Calf Raise", de: "Wadenheben" }, pptCat: "concentricos", cat: "fuerza", ct: "con", mus: ["calf", "tibant"], lvl: 1, grp: ["adulto", "mayor", "deportista", "lesionado"],
+        pose: { A: {}, B: { rise: 0.14 }, spd: 0.5 },
+        initPos: "De pie con pies paralelos al ancho de caderas y apoyo ligero en pared.",
+        finalPos: "Apoyo sobre las puntas de los pies en máxima flexión plantar.",
+        dirMov: "Elevación vertical de talones (concéntrica) y retorno controlado al suelo (excéntrica).",
+        obj: "Fortalecer gemelos y sóleo para la estabilidad del tobillo y propulsión de la marcha (Paso 7 y 9 del PPT).",
+        steps: ["De pie erguido cerca de una pared como apoyo de seguridad.", "Eleva ambos talones subiendo sobre las puntas de los pies.", "Mantén 1 segundo en el punto más alto.", "Desciende los talones de forma controlada."],
+        err: ["Doblar las rodillas", "Rebotar sin control"], contra: ["Rotura aguda del tendón de Aquiles"],
+        easy: "Con ambas manos apoyadas.", hard: "Realizar el descenso sobre una sola pierna (3 s).", breath: "Exhala al elevar, inhala al bajar." },
+
+    { id: "sqe", n: { es: "Sentadilla excéntrica controlada", en: "Controlled Eccentric Squat", de: "Kontrollierte exzentrische Kniebeuge" }, pptCat: "concentricos", cat: "fuerza", ct: "exc", mus: ["quad", "glutmax", "core"], lvl: 2, grp: ["adulto", "deportista", "lesionado"],
+        pose: { A: {}, B: { h: 85, k: 110, t: 30, s: 85 }, spd: 0.3 },
+        initPos: "Bipedestación erguida con pies al ancho de los hombros.",
+        finalPos: "Flexión de cadera y rodillas a 90° con brazos extendidos al frente.",
+        dirMov: "Descenso lento en 3-4 segundos (énfasis excéntrico) y subida fluida.",
+        obj: "Mejorar la absorción de carga tendinosa y el control excéntrico del cuádriceps.",
+        steps: ["Pies al ancho de hombros.", "Baja la cadera atrás y abajo contando 3 a 4 segundos.", "Mantén las rodillas alineadas con la punta de los pies.", "Sube empujando el suelo con firmeza."],
+        err: ["Bajar rápido sin frenar", "Levantar los talones"], contra: ["Dolor patelofemoral agudo"],
+        easy: "Rango corto hasta 45°.", hard: "Descenso en 5 segundos.", breath: "Inhala durante el descenso lento, exhala al subir." },
+
+    { id: "wall", n: { es: "Sentadilla isométrica en pared (Wall Sit)", en: "Wall Sit", de: "Wandsitzen" }, pptCat: "isometricos", cat: "fuerza", ct: "iso", mus: ["quad", "glutmax"], lvl: 2, grp: ["adulto", "deportista", "lesionado"],
+        pose: { A: { h: 90, k: 90, s: 0 }, B: { h: 90, k: 90, s: 0 }, hold: 1 },
+        initPos: "Espalda apoyada en la pared con caderas y rodillas a 90°.",
+        finalPos: "Mantenimiento estático de la postura sin movimiento articular.",
+        dirMov: "Contracción isométrica sostenida contra la gravedad.",
+        obj: "Generar analgesia tendinosa y resistencia isométrica en cuádriceps.",
+        steps: ["Apoya la espalda contra una pared lisa.", "Deslízate hasta formar un ángulo de 90° en rodillas y tobillos.", "Mantén el abdomen activo y respira de forma fluida.", "Al terminar el tiempo, incorpórate deslizando por la pared."],
+        err: ["Apoyar las manos sobre los muslos", "Aguantar la respiración"], contra: ["Hipertensión no controlada"],
+        easy: "Flexión menor (45° a 60°).", hard: "Aumentar a 45 segundos.", breath: "Respiración continua sin apnea." },
+
+    { id: "pl", n: { es: "Plancha abdominal isométrica", en: "Isometric Plank", de: "Unterarmstütz" }, pptCat: "isometricos", cat: "fuerza", ct: "iso", mus: ["rect", "core", "erector", "delt"], lvl: 2, grp: ["adulto", "deportista", "infantil"],
+        pose: { A: { tilt: 84, s: 84, e: 0 }, B: { tilt: 84, s: 84, e: 0 }, hold: 1 },
+        initPos: "Apoyo de antebrazos y puntas de pies con cuerpo alineado.",
+        finalPos: "Alineación mantenida de cabeza, columna y pelvis.",
+        dirMov: "Estabilización isométrica anticollisoria de tronco y hombros.",
+        obj: "Estabilizar el core profundo y la cintura escapular.",
+        steps: ["Apoya los codos justo debajo de los hombros.", "Eleva la pelvis formando una línea recta de cabeza a talones.", "Activa abdomen y glúteos sin hundir la zona lumbar.", "Sostén el tiempo indicado."],
+        err: ["Dejar caer la cadera", "Contener el aire"], contra: ["Dolor agudo de hombro o muñeca"],
+        easy: "Apoyando las rodillas en la colchoneta.", hard: "45 segundos o elevando un pie.", breath: "Inhalaciones y exhalaciones cortas y constantes." },
+
+    { id: "brh", n: { es: "Puente glúteo isométrico", en: "Held Glute Bridge", de: "Gehaltenes Beckenheben" }, pptCat: "isometricos", cat: "fuerza", ct: "iso", mus: ["glutmax", "ham", "core"], lvl: 1, grp: ["adulto", "mayor", "lesionado", "especial"],
+        pose: { A: { tilt: -118, h: 2, k: 82, s: -28 }, B: { tilt: -118, h: 2, k: 82, s: -28 }, hold: 1 },
+        initPos: "Boca arriba con rodillas flexionadas y pelvis elevada en puente.",
+        finalPos: "Sostenimiento isométrico de la pelvis alineada con hombros y rodillas.",
+        dirMov: "Contracción isométrica de extensores de cadera.",
+        obj: "Activar glúteo mayor e isquiotibiales sin sobrecargar la columna lumbar.",
+        steps: ["Acuéstate boca arriba con plantas apoyadas.", "Eleva la pelvis hasta alinear hombros, caderas y rodillas.", "Sostén la posición respirando con normalidad.", "Desciende vértebra por vértebra."],
+        err: ["Hiperextender la zona lumbar"], contra: ["Dolor lumbar agudo a la extensión"],
+        easy: "Series cortas de 15 segundos.", hard: "Puente sostenido con banda elástica en rodillas.", breath: "Respira de forma fluida." },
+
+    { id: "br", n: { es: "Puente de glúteos dinámico", en: "Glute Bridge", de: "Beckenheben" }, pptCat: "fortalecimiento", cat: "fuerza", ct: "dyn", mus: ["glutmax", "ham", "core", "erector"], lvl: 1, grp: ["adulto", "mayor", "lesionado", "deportista"],
+        pose: { A: { tilt: -92, h: 70, k: 110, s: -2 }, B: { tilt: -118, h: 2, k: 82, s: -28 }, spd: 0.4 },
+        initPos: "Decúbito supino con rodillas flexionadas y pelvis en el suelo.",
+        finalPos: "Pelvis elevada alineada con el tronco y los muslos.",
+        dirMov: "Extensión vertical de cadera y descenso articulado.",
+        obj: "Fortalecer glúteos y estabilizadores lumbo-pélvicos (Rutina de Cadera).",
+        steps: ["Boca arriba con rodillas flexionadas y pies al ancho de caderas.", "Aprieta los glúteos y sube la cadera en 2 segundos.", "Pausa 1 segundo arriba sin arquear la espalda.", "Baja lentamente al suelo."],
+        err: ["Empujar con el cuello", "Arquear la espalda baja"], contra: ["Dolor agudo en columna lumbar"],
+        easy: "Recorrido a media altura.", hard: "Puente unilateral.", breath: "Exhala al subir, inhala al bajar." },
+
+    { id: "hab", n: { es: "Abducción de cadera de pie", en: "Standing Hip Abduction", de: "Hüftabduktion im Stand" }, pptCat: "fortalecimiento", cat: "fuerza", ct: "dyn", mus: ["glutmed", "addu"], lvl: 1, grp: ["mayor", "adulto", "lesionado", "deportista"],
+        pose: { A: { Rab: 3 }, B: { Rab: 35 }, spd: 0.4 },
+        initPos: "De pie erguido con piernas juntas y mano en soporte.",
+        finalPos: "Pierna elevada lateralmente a 35° manteniendo la pelvis nivelada.",
+        dirMov: "Separación lateral en el plano frontal (abducción) y retorno controlado.",
+        obj: "Fortalecer el glúteo medio para estabilizar cadera y rodilla (Rutina de Cadera).",
+        steps: ["Sujétate de una silla o pared con el tronco recto.", "Separa una pierna hacia el costado con la punta del pie mirando al frente.", "Evita inclinar el tronco hacia el lado opuesto.", "Regresa despacio a la posición inicial."],
+        err: ["Inclinar el torso", "Rotar la punta del pie hacia afuera"], contra: ["Bursitis trocantérea aguda dolorosa"],
+        easy: "Rango corto sin banda.", hard: "Con banda elástica en los tobillos.", breath: "Exhala al separar la pierna." },
+
+    { id: "fr", n: { es: "Elevación frontal de hombros", en: "Front Shoulder Raise", de: "Frontheben" }, pptCat: "movilidad", cat: "movilidad", ct: "dyn", mus: ["delt", "trap", "cuff"], lvl: 1, grp: ["adulto", "mayor", "lesionado", "especial"],
+        pose: { A: { s: 0 }, B: { s: 95 }, spd: 0.4 },
+        initPos: "Bipedestación con brazos relajados a los lados del tronco.",
+        finalPos: "Brazos elevados al frente a 90° a la altura de los hombros.",
+        dirMov: "Flexión sagital de hombro controlada en ascenso y descenso.",
+        obj: "Recuperar el rango articular y control del hombro (Rutina de Hombro VS Code).",
+        steps: ["De pie con los hombros relajados y lejos de las orejas.", "Eleva ambos brazos hacia adelante hasta la altura de los hombros.", "Mantén los codos extendidos sin rigidez.", "Desciende lentamente en 3 segundos."],
+        err: ["Encoger los hombros hacia el cuello", "Arquear la espalda"], contra: ["Pinzamiento subacromial agudo"],
+        easy: "Elevar hasta 60° o con bastón.", hard: "Con mancuernas ligeras de 1-2 kg.", breath: "Exhala al subir, inhala al bajar." },
+
+    { id: "lr", n: { es: "Abducción / Elevación lateral de hombros", en: "Lateral Arm Raise", de: "Seitheben" }, pptCat: "movilidad", cat: "movilidad", ct: "dyn", mus: ["delt", "cuff", "trap"], lvl: 1, grp: ["adulto", "mayor", "lesionado", "deportista"],
+        pose: { A: { sab: 5 }, B: { sab: 88 }, spd: 0.4 },
+        initPos: "De pie con brazos a los costados del cuerpo.",
+        finalPos: "Brazos abiertos en cruz hasta 90° de abducción.",
+        dirMov: "Apertura en plano frontal/escapular y descenso controlado.",
+        obj: "Movilizar y fortalecer el complejo articular del hombro y manguito rotador (Rutina de Hombro).",
+        steps: ["De pie con postura erguida.", "Eleva los brazos lateralmente hasta alcanzar la línea horizontal de los hombros.", "Mantén los pulgares ligeramente hacia arriba para proteger el espacio subacromial.", "Baja con control."],
+        err: ["Superar los 90° encogiendo el trapecio"], contra: ["Desgarro agudo del supraespinoso"],
+        easy: "Con codos ligeramente flexionados.", hard: "Con banda elástica pisada.", breath: "Exhala al abrir los brazos." },
+
+    { id: "row", n: { es: "Remo escapular con banda", en: "Scapular Band Row", de: "Rudern mit Band" }, pptCat: "fortalecimiento", cat: "fuerza", ct: "con", mus: ["lats", "trap", "biceps", "cuff"], lvl: 1, grp: ["adulto", "mayor", "deportista", "lesionado"],
+        pose: { A: { s: 88, e: 0, t: 4 }, B: { s: 18, e: 110, t: 4 }, spd: 0.4 },
+        initPos: "Brazos extendidos al frente sujetando la banda elástica.",
+        finalPos: "Codos flexionados hacia atrás con retracción de escápulas.",
+        dirMov: "Tracción horizontal hacia el tronco (concéntrica) y retorno frenado (excéntrica).",
+        obj: "Fortalecer retractores escapulares y estabilizadores posteriores del hombro.",
+        steps: ["Sujeta la banda fija a la altura del pecho.", "Tira llevando los codos hacia atrás y juntando los omóplatos.", "Mantén el cuello largo sin subir los hombros.", "Regresa despacio estirando los brazos."],
+        err: ["Subir los hombros", "Impulsarse inclinando el tronco atrás"], contra: ["Dolor cervical o dorsal agudo"],
+        easy: "Banda de baja resistencia.", hard: "Pausa isométrica de 2 segundos atrás.", breath: "Exhala al traccionar." },
+
+    { id: "tm", n: { es: "Movilidad torácica y escapular", en: "Thoracic & Scapular Mobility", de: "Brustwirbelsäulen-Mobilisation" }, pptCat: "movilidad", cat: "movilidad", ct: "mov", mus: ["erector", "trap", "diaph"], lvl: 1, grp: ["adulto", "mayor", "deportista", "especial"],
+        pose: { A: { t: -14, s: 145 }, B: { t: 18, s: 60 }, spd: 0.3 },
+        initPos: "De pie con apertura torácica y brazos elevados.",
+        finalPos: "Flexión dorsal suave llevando brazos al frente.",
+        dirMov: "Extensión e inspiración seguidas de flexión suave y exhalación.",
+        obj: "Mejorar la movilidad de la columna dorsal y la expansión costal.",
+        steps: ["De pie con rodillas relajadas.", "Inhala abriendo el pecho y elevando los brazos.", "Exhala redondeando suavemente la parte alta de la espalda.", "Repite con ritmo fluido y sin dolor."],
+        err: ["Arquear bruscamente la cintura"], contra: ["Fractura vertebral reciente"],
+        easy: "Sentado en una silla.", hard: "Sostener 3 segundos la apertura.", breath: "Inhala al abrir, exhala al cerrar." },
+
+    { id: "kr", n: { es: "Flexión alterna de cadera (Movilidad)", en: "Hip Flexion Mobility", de: "Hüftmobilisation" }, pptCat: "movilidad", cat: "movilidad", ct: "mov", mus: ["hipflex", "glutmed", "core"], lvl: 1, grp: ["mayor", "adulto", "deportista", "lesionado"],
+        pose: { A: {}, B: { Lh: 90, Lk: 95, Rs: -20, Ls: 25 }, spd: 0.35 },
+        initPos: "Bipedestación equilibrada.",
+        finalPos: "Una rodilla elevada a 90° de flexión de cadera.",
+        dirMov: "Elevación sagital controlada de la rodilla hacia el pecho.",
+        obj: "Lubricar la articulación coxofemoral y activar el control lumbo-pélvico (Rutina de Cadera).",
+        steps: ["De pie cerca de un punto de apoyo.", "Eleva una rodilla hasta la altura de la cadera manteniendo el tronco recto.", "Sostén 1 segundo arriba.", "Baja con control y alterna."],
+        err: ["Inclinar la espalda hacia atrás"], contra: ["Pinzamiento femoroacetabular agudo"],
+        easy: "Elevar a menor altura.", hard: "Mantener 3 segundos arriba sin apoyo.", breath: "Exhala al elevar la rodilla." },
+
+    { id: "sl", n: { es: "Equilibrio monopodal (Propiocepción)", en: "Single-Leg Balance", de: "Einbeinstand" }, pptCat: "equilibrio", cat: "equilibrio", ct: "iso", mus: ["glutmed", "tibant", "calf", "core"], lvl: 1, grp: ["mayor", "adulto", "infantil", "deportista", "lesionado"],
+        pose: { A: { Lh: 65, Lk: 90 }, B: { Lh: 65, Lk: 90 }, hold: 1 },
+        initPos: "Apoyo sobre una sola pierna con la rodilla opuesta elevada.",
+        finalPos: "Estabilización propioceptiva mantenida de tobillo, rodilla y cadera.",
+        dirMov: "Microajustes isométricos posturales sobre el pie de apoyo.",
+        obj: "Reeducar la propiocepción del tobillo y prevenir caídas (Rutina de Tobillo del PPT).",
+        steps: ["Colócate cerca de una pared o silla por seguridad.", "Levanta un pie del suelo y fija la mirada en un punto al frente.", "Mantén el arco del pie activo y la pelvis estable.", "Cambia de pierna al completar el tiempo."],
+        err: ["Mirar al suelo", "Bloquear rígidamente la rodilla de apoyo"], contra: ["Vértigo agudo sin asistencia"],
+        easy: "Apoyando la yema de los dedos en la pared.", hard: "Sobre cojín inestable o cerrando los ojos.", breath: "Respiración tranquila y constante." },
+
+    { id: "march", n: { es: "Marcha coordinada en el sitio", en: "Coordinated Marching", de: "Koordiniertes Marschieren" }, pptCat: "coordinacion", cat: "equilibrio", ct: "dyn", mus: ["hipflex", "quad", "glutmed", "core"], lvl: 1, grp: ["mayor", "adulto", "infantil", "especial", "lesionado"],
+        pose: { A: { Lh: 65, Lk: 75, Rh: 0, Rk: 0, Ls: -25, Rs: 35 }, B: { Rh: 65, Rk: 75, Lh: 0, Lk: 0, Rs: -25, Ls: 35 }, spd: 0.65 },
+        initPos: "De pie con elevación cruzada de rodilla izquierda y brazo derecho.",
+        finalPos: "Alternancia rítmica a rodilla derecha y brazo izquierdo.",
+        dirMov: "Patrón cruzado recíproco de marcha y control motor.",
+        obj: "Mejorar la coordinación interhemisférica, el ritmo de marcha y el control motor.",
+        steps: ["De pie erguido con abdomen ligeramente activo.", "Eleva la rodilla izquierda mientras adelantas el brazo derecho.", "Cambia de forma fluida a la rodilla derecha y brazo izquierdo.", "Mantén una cadencia constante y aterrizaje suave."],
+        err: ["Mover el mismo brazo y pierna a la vez"], contra: ["Disnea severa o mareo"],
+        easy: "Sentado en silla o a ritmo lento.", hard: "Mantener una pausa de 2 segundos en cada cambio.", breath: "Respira de forma rítmica." },
+
+    { id: "lu", n: { es: "Zancada atrás con control motor", en: "Controlled Reverse Lunge", de: "Ausfallschritt rückwärts" }, pptCat: "coordinacion", cat: "fuerza", ct: "dyn", mus: ["quad", "glutmax", "glutmed", "ham"], lvl: 2, grp: ["adulto", "deportista", "lesionado"],
+        pose: { A: {}, B: { Lh: 70, Lk: 80, Rh: -25, Rk: 85, t: 6 }, spd: 0.4 },
+        initPos: "Bipedestación simétrica.",
+        finalPos: "Posición de caballito con ambas rodillas a ~85° y tronco estable.",
+        dirMov: "Paso posterior disociado, descenso controlado y empuje de retorno.",
+        obj: "Desarrollar coordinación multiarticular y estabilidad dinámica de rodilla y tobillo.",
+        steps: ["Da un paso largo hacia atrás apoyando la punta del pie trasero.", "Flexiona ambas rodillas manteniendo el torso erguido.", "Verifica que la rodilla delantera apunte hacia el segundo dedo del pie.", "Vuelve a la posición inicial empujando con la pierna delantera."],
+        err: ["Desviar la rodilla delantera hacia adentro"], contra: ["Dolor agudo patelofemoral"],
+        easy: "Con apoyo lateral en silla.", hard: "Añadir elevación de rodilla al subir.", breath: "Inhala al bajar, exhala al regresar." },
+
+    { id: "hrx", n: { es: "Descenso excéntrico de talones", en: "Eccentric Heel Drop", de: "Exzentrisches Fersensenken" }, pptCat: "concentricos", cat: "fuerza", ct: "exc", mus: ["calf", "tibant"], lvl: 2, grp: ["adulto", "deportista", "lesionado"],
+        pose: { A: { rise: 0.14 }, B: { rise: 0 }, spd: 0.28 },
+        initPos: "En puntillas con máxima elevación de talones.",
+        finalPos: "Talones apoyados tras un descenso lento de 4 segundos.",
+        dirMov: "Fase excéntrica pura controlada del tríceps sural.",
+        obj: "Fortalecer el tendón de Aquiles y estabilizadores del tobillo (Rutina de Tobillo).",
+        steps: ["Sube a la punta de los pies usando ambas piernas.", "Desciende los talones muy despacio contando 4 segundos.", "Mantén el control del tobillo sin que se vuelque hacia afuera.", "Repite el ciclo."],
+        err: ["Dejar caer el talón rápido"], contra: ["Inflamación aguda severa del tendón de Aquiles"],
+        easy: "Con ambos pies y apoyo en pared.", hard: "En el borde de un escalón.", breath: "Inhala durante el descenso lento." },
+
+    { id: "ke", n: { es: "Extensión de rodilla sentado", en: "Seated Knee Extension", de: "Kniestrecken im Sitzen" }, pptCat: "concentricos", cat: "fuerza", ct: "con", mus: ["quad"], lvl: 1, grp: ["mayor", "lesionado", "especial", "adulto"],
+        pose: { A: { h: 90, k: 90, chair: 1 }, B: { Rh: 90, Rk: 0, Lh: 90, Lk: 90 }, chair: 1, spd: 0.4 },
+        initPos: "Sentado en silla con ambas rodillas a 90°.",
+        finalPos: "Rodilla extendida horizontalmente con cuádriceps contraído.",
+        dirMov: "Extensión concéntrica de rodilla en cadena cinética abierta y descenso lento.",
+        obj: "Aislar y fortalecer el cuádriceps sin carga axial sobre la articulación.",
+        steps: ["Siéntate con la espalda bien apoyada.", "Extiende una pierna hasta alinear el tobillo con la rodilla.", "Mantén 2 segundos apretando el muslo.", "Baja en 3 segundos."],
+        err: ["Dar un latigazo al extender"], contra: ["Posoperatorio inmediato de LCA sin indicación"],
+        easy: "Sin peso adicional.", hard: "Con tobillera lastrada o banda elástica.", breath: "Exhala al extender la pierna." },
+
+    { id: "br2", n: { es: "Respiración diafragmática guiada", en: "Diaphragmatic Breathing", de: "Zwerchfellatmung" }, pptCat: "coordinacion", cat: "respiratorio", ct: "mov", mus: ["diaph", "core"], lvl: 1, grp: ["adulto", "mayor", "infantil", "especial", "deportista", "lesionado"],
+        pose: { A: { sab: 12 }, B: { sab: 32 }, spd: 0.22 },
+        initPos: "Postura cómoda con manos sobre pecho y abdomen.",
+        finalPos: "Expansión abdominal y costal baja sin elevar los hombros.",
+        dirMov: "Descenso diafragmático en inspiración (4 s) y retorno en exhalación (6 s).",
+        obj: "Coordinar el diafragma con el core profundo y reducir la tensión muscular.",
+        steps: ["Coloca una mano en el pecho (debe permanecer quieta) y otra en el abdomen.", "Inhala lento por la nariz durante 4 segundos inflando el abdomen.", "Exhala suavemente por la boca durante 5 a 6 segundos.", "Mantén el cuello y los hombros relajados."],
+        err: ["Elevar los hombros al tomar aire", "Hiperventilar"], contra: ["Si aparece mareo, retoma tu respiración habitual"],
+        easy: "Inhala 3 s, exhala 4 s.", hard: "Inhala 4 s, exhala 7 s activando el transverso.", breath: "Flujo nasal-bucal continuo." },
+
+    { id: "jump", n: { es: "Salto vertical reactivo (Pliometría)", en: "Vertical Reactive Jump", de: "Vertikalsprung" }, pptCat: "coordinacion", cat: "pliometria", ct: "dyn", mus: ["quad", "glutmax", "calf"], lvl: 3, grp: ["deportista", "adulto", "infantil"],
+        pose: { A: { h: 55, k: 85, t: 25, s: -35 }, B: { h: 0, k: 0, t: 0, s: 130, rise: 0.12, air: 0.22 }, spd: 0.55 },
+        initPos: "Semiflexión de carga con brazos atrás.",
+        finalPos: "Despegue vertical con triple extensión y amortiguación suave.",
+        dirMov: "Ciclo estiramiento-acortamiento (CEA) explosivo y aterrizaje alineado.",
+        obj: "Desarrollar potencia reactiva y control del aterrizaje neuromuscular.",
+        steps: ["Pies al ancho de caderas.", "Realiza una flexión rápida de un cuarto de sentadilla.", "Salta verticalmente extendiendo brazos y piernas.", "Aterriza suavemente sobre metatarso y flexiona rodillas para absorber el impacto."],
+        err: ["Aterrizar con rodillas rígidas o hacia adentro"], contra: ["Lesión aguda, artrosis severa u osteoporosis"],
+        easy: "Saltitos suaves sin despegar casi del suelo.", hard: "Saltos continuos reactivos.", breath: "Exhala al despegar." }
+    ];
+
+    const EXH = {};
+    EX.forEach(e => EXH[e.id] = e);
+
+    /* ===== PROGRAMAS ASIGNADOS (PASO 9 DEL PPT Y ARCHIVOS VS CODE) ===== */
+    const PRESET_ROUTINES = [
+    {
+        id: "tobillo",
+        title: { es: "Rehabilitación Tobillo", en: "Ankle Rehabilitation", de: "Sprunggelenk-Reha" },
+        badge: "PROGRAMA ASIGNADO (PPT)",
+        objective: "Fuerza & Equilibrio",
+        duration: "15 mins",
+        intensity: "Moderada (RPE 5-6/10) · Movimientos controlados sin dolor",
+        physioNote: "Mantener el apoyo del trípode plantar. Respetar los 60 s de descanso entre series (Paso 9 y 10 del Manual).",
+        items: [
+        { ex: "sts", sets: 2, reps: 8, hold: 0, rest: 60, unit: "rep", note: "Descenso y ascenso controlados hacia la silla (Ejemplo oficial Paso 10 PPT)." },
+        { ex: "hr", sets: 3, reps: 12, hold: 0, rest: 45, unit: "rep", note: "Subir en 2 s y bajar controlado en 3 s." },
+        { ex: "sl", sets: 3, reps: 0, hold: 30, rest: 45, unit: "s", note: "Mantener la pelvis y el tobillo estables." },
+        { ex: "hrx", sets: 3, reps: 8, hold: 0, rest: 60, unit: "rep", note: "Énfasis en la bajada lenta de 4 segundos." }
+        ]
+    },
+    {
+        id: "hombro",
+        title: { es: "Rehabilitación de Hombro", en: "Shoulder Rehabilitation", de: "Schulter-Reha" },
+        badge: "PROYECTO VS CODE",
+        objective: "Movilidad Escapular & Manguito Rotador",
+        duration: "18 mins",
+        intensity: "Suave-Moderada (RPE 4-6/10) · Sin encoger trapecio superior",
+        physioNote: "Evitar elevar por encima de 90° si existe molestia subacromial.",
+        items: [
+        { ex: "tm", sets: 2, reps: 10, hold: 0, rest: 30, unit: "rep", note: "Acompañar con respiración profunda." },
+        { ex: "fr", sets: 3, reps: 10, hold: 0, rest: 60, unit: "rep", note: "Hombros lejos de las orejas." },
+        { ex: "lr", sets: 3, reps: 10, hold: 0, rest: 60, unit: "rep", note: "Pulgares ligeramente hacia arriba." },
+        { ex: "row", sets: 3, reps: 12, hold: 0, rest: 60, unit: "rep", note: "Juntar escápulas 2 segundos al final." }
+        ]
+    },
+    {
+        id: "cadera",
+        title: { es: "Rehabilitación de Cadera y Pelvis", en: "Hip & Pelvis Rehabilitation", de: "Hüft-Reha" },
+        badge: "PROYECTO VS CODE",
+        objective: "Estabilidad Lumbo-Pélvica & Glúteo Medio",
+        duration: "20 mins",
+        intensity: "Moderada (RPE 6/10) · Control de alineación fémoro-pélvica",
+        physioNote: "Priorizar la activación de glúteo mayor y medio sin compensar con la columna lumbar.",
+        items: [
+        { ex: "kr", sets: 2, reps: 10, hold: 0, rest: 40, unit: "rep", note: "Alternar piernas sin inclinar el tronco." },
+        { ex: "br", sets: 3, reps: 12, hold: 0, rest: 60, unit: "rep", note: "Pausa de 1 s arriba apretando glúteos." },
+        { ex: "hab", sets: 3, reps: 12, hold: 0, rest: 45, unit: "rep", note: "Punta del pie mirando siempre al frente." },
+        { ex: "brh", sets: 3, reps: 0, hold: 30, rest: 60, unit: "s", note: "Mantener pelvis nivelada." }
+        ]
+    }
+    ];
+
+    /* ===== RUTAS POR PACIENTE (ARCHIVO 3 HTML) ===== */
+    const ROUTES = {
+    infantil: { desc: "Ejercicios convertidos en misiones y juegos para desarrollar coordinación, equilibrio y postura.", innov: "Cada ejercicio suma puntos y medallas.", items: ["sl", "jump", "march", "sts", "pl"] },
+    adulto: { desc: "Prevención de dolor lumbar y cervical, postura y fortalecimiento funcional.", innov: "Rutinas adaptadas a pausas activas y hogar.", items: ["br", "pl", "row", "tm", "sts"] },
+    mayor: { desc: "Prevención de caídas, equilibrio monopodal y fuerza para levantarse con independencia.", innov: "Progresión segura con soporte cercano.", items: ["sts", "sl", "hr", "march", "br2"] },
+    deportista: { desc: "Control excéntrico, fuerza reactiva, pliometría y prevención de lesiones.", innov: "Dosificación por fases de contracción y CEA.", items: ["sqe", "hrx", "lu", "jump", "pl"] },
+    lesionado: { desc: "Rehabilitación estructurada por criterios funcionales y control del dolor.", innov: "Avance por tolerancia (dolor ≤ 3/10) y no solo por calendario.", items: ["wall", "brh", "ke", "sqe", "hrx"] },
+    especial: { desc: "Programas suaves para condiciones crónicas, neurológicas o cardiorrespiratorias.", innov: "Control de fatiga y respiración diafragmática integrada.", items: ["br2", "sts", "march", "fr", "ke"] }
+    };
+
+    /* ===== RECURSOS DE EDUCACIÓN, NUTRICIÓN E HIDRATACIÓN (PÁG. 18 PPT + HTML 3) ===== */
+    const NUTRI = [
+    { t: "1. Hidratación en la actividad física", d: "Pilar fundamental del Manual (Pág. 18)", tips: ["Bebe agua antes, durante y después de tu rutina fisioterapéutica.", "Una deshidratación del 2% reduce la coordinación neuromuscular y aumenta la fatiga.", "Usa el contador de vasos de arriba para cumplir tu meta diaria (~35 ml por kg de peso)."] },
+    { t: "2. Recuperación y señales de alerta", d: "Descanso tisular y límites seguros (Págs. 18 y 19)", tips: ["El tejido muscular y tendinoso se adapta durante el descanso y el sueño (7 a 9 horas).", "Detén el ejercicio inmediatamente si aparece dolor punzante intenso, mareo o dificultad respiratoria.", "Respeta siempre los segundos de descanso indicados entre series."] },
+    { t: "3. Nutrición para la reparación muscular", d: "Alimentación equilibrada y rendimiento (Pág. 18)", tips: ["Incluye proteína de calidad (huevo, pescado, pollo, legumbres, quinua) para reparar fibras.", "Acompaña con carbohidratos complejos (avena, camote) para reponer glucógeno.", "Consume calcio y vitamina D para proteger la salud ósea y articular."] },
+    { t: "4. Dispositivos complementarios (Smartwatch)", d: "Integración con relojes inteligentes (Págs. 4 y 18)", tips: ["Permite controlar tiempos de trabajo, descansos y frecuencia cardíaca desde la muñeca.", "Utiliza el «Modo Reloj / Temporizador» integrado en la app con alertas sonoras y vibración."] }
+    ];
+
+    const FOODS = [
+    ["Quinua cocida", 120, 4.4, 21, 1.9], ["Lentejas cocidas", 116, 9.0, 20, 0.4],
+    ["Huevo entero", 143, 12.6, 0.7, 9.5], ["Pechuga de pollo", 165, 31.0, 0, 3.6],
+    ["Atún al natural", 116, 26.0, 0, 1.0], ["Yogur natural", 61, 3.5, 4.7, 3.3],
+    ["Plátano", 89, 1.1, 23, 0.3], ["Palta", 160, 2.0, 8.5, 14.7],
+    ["Avena", 389, 16.9, 66, 6.9], ["Camote cocido", 90, 2.0, 21, 0.2]
+    ];
+
+    const RECIPES = [
+    { t: "Batido post-rehabilitación", tm: "5 min", ing: ["1 plátano", "200 ml de leche o yogur", "2 cdas de avena"], st: "Licúa todos los ingredientes y consúmelo dentro de la primera hora tras tu sesión." },
+    { t: "Bowl andino de quinua y palta", tm: "15 min", ing: ["1 taza de quinua cocida", "1/2 palta en cubos", "1 huevo duro", "Tomate y limón"], st: "Mezcla la quinua fría o tibia con las verduras, el huevo y la palta." },
+    { t: "Tortilla proteica de espinaca", tm: "10 min", ing: ["2 huevos", "1 taza de espinaca fresca", "1 cdita de aceite de oliva"], st: "Saltea la espinaca 1 minuto, vierte los huevos batidos y cuaja a fuego medio." }
+    ];
+
+    const REFS = [
+    { org: "UNC Medical Center (Rehabilitación)", title: "Guía clínica de respiración diafragmática", pts: ["Inhalar por la nariz 3-5 s expandiendo el abdomen; exhalar por la boca 3-5 s manteniendo el pecho quieto.", "Reduce la tensión de músculos accesorios (trapecio) y favorece la estabilidad lumbar."] },
+    { org: "The Pulse Program / Revista CDEFIS", title: "Ciclo estiramiento-acortamiento (CEA) y dosificación pliométrica", pts: ["3 a 4 series de 5 a 10 repeticiones con descansos de 90 a 180 s.", "Detener la serie si se pierde altura de salto o control en la alineación de rodilla."] }
+    ];
+
+    /* ===== ESTADO PERSISTENTE Y ALMACENAMIENTO ===== */
+const LSK = "physiomotion3d_integrated_v2";
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LSK);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+const DEFAULT_LOGS = [
+  { id: "l1", date: new Date(Date.now() - 86400000 * 2).toISOString().slice(0, 10), routine: "Rehabilitación Tobillo", duration: 15, rpe: 6, pain: 2, doneCount: 4, totalCount: 4, obs: "Buen control en elevación de talones." },
+  { id: "l2", date: new Date(Date.now() - 86400000).toISOString().slice(0, 10), routine: "Rehabilitación de Hombro", duration: 18, rpe: 5, pain: 2, doneCount: 4, totalCount: 4, obs: "Sin molestia al elevar los brazos a 90 grados." }
+];
+
+const S = Object.assign({
+  lang: "es",
+  theme: "dark",
+  bigText: false,
+  loggedIn: false,
+  users: [],
+  user: {
+    name: "Paciente PhysioMotion",
+    dob: "2002-05-14",
+    email: "usuario@physiomotion3d.com",
+    role: "Paciente",
+    activity: "Moderado (2-3 días/sem)",
+    objectives: ["1. Mejorar la movilidad", "2. Desarrollar fuerza", "6. Programa fisioterapéutico"],
+    weight: 68,
+    avatar: "",
+    parentAuth: false
+  },
+  activeRoutineId: "tobillo",
+  customRoutines: PRESET_ROUTINES[0].items.map(x => ({ ...x })),
+  customEx: [],
+  logs: DEFAULT_LOGS,
+  water: { d: new Date().toISOString().slice(0, 10), ml: 750 },
+  shop: [{ t: "Quinua (500 g)", done: false }, { t: "Huevos (docena)", done: true }],
+  scans: [],
+  physioMessages: [
+    { date: "Hoy", from: "Dr. Fisioterapeuta", text: "Programa activo: Rehabilitación Tobillo. Prioriza el descenso controlado de 3 segundos en la sentadilla hacia la silla y respeta los 60 s de descanso." }
+  ]
+}, loadState());
+
+function save() {
+  try { localStorage.setItem(LSK, JSON.stringify(S)); } catch (e) {}
+}
+
+const UI = {
+  screen: S.loggedIn ? "home" : "welcome",
+  stack: [],
+  q: "",
+  pptCat: "all",
+  exTab: "steps",
+  mreg: "all",
+  mside: "front",
+  routineId: "tobillo",
+  exec: null,
+  dose: { ex: "sts", goal: "fuerza", group: "adulto", level: 1, pain: 2, flags: [], red: [] },
+  routeGroup: "adulto",
+  scan: { mode: "post", zone: "Rodilla", img: null, imgEl: null, pts: [] },
+  timer: { work: 30, rest: 15, rounds: 4, round: 1, phase: "idle", rem: 30, run: false }
+};
+
+const t = k => (I18N[S.lang] && I18N[S.lang][k]) || I18N.es[k] || k;
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const allEx = () => EX.concat(S.customEx || []);
+const getEx = id => allEx().find(x => x.id === id) || EX[0];
+const exName = e => (e.n && (e.n[S.lang] || e.n.es)) || e.name || "";
+const mName = m => (m.n && (m.n[S.lang] || m.n.es)) || "";
+
+let toastTimer = null;
+function toast(msg) {
+  let el = document.querySelector(".toast");
+  if (el) el.remove();
+  el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  document.body.appendChild(el);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.remove(), 2600);
+}
+
+/* ===== AUDIO BEEPS PARA TEMPORIZADOR Y EJECUCIÓN ===== */
+let audioCtx = null;
+function beep(freq = 880, dur = 0.14) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = freq;
+    gain.gain.value = 0.15;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+/* ===== INDEXEDDB PARA VIDEOS LOCALES (ARCHIVO 3) ===== */
+let IDB = null;
+function openVideoDB() {
+  return new Promise((resolve, reject) => {
+    if (IDB) return resolve(IDB);
+    const req = indexedDB.open("physiomotion3d_videos", 1);
+    req.onupgradeneeded = () => req.result.createObjectStore("videos", { keyPath: "id" });
+    req.onsuccess = () => { IDB = req.result; resolve(IDB); };
+    req.onerror = () => reject(req.error);
+  });
+}
+async function getVideosByEx(exId) {
+  try {
+    const db = await openVideoDB();
+    return await new Promise((res, rej) => {
+      const r = db.transaction("videos").objectStore("videos").getAll();
+      r.onsuccess = () => res((r.result || []).filter(v => v.ex === exId));
+      r.onerror = () => rej();
+    });
+  } catch (e) { return []; }
+}
+async function saveVideoRecord(rec) {
+  const db = await openVideoDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction("videos", "readwrite");
+    tx.objectStore("videos").put(rec);
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej();
+  });
+}
+async function deleteVideoRecord(id) {
+  const db = await openVideoDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction("videos", "readwrite");
+    tx.objectStore("videos").delete(id);
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej();
+  });
+}
+
+/* ===== MOTOR 3D DE CINEMÁTICA DIRECTA Y RENDERIZADO DE FIBRAS MUSCULARES ===== */
+const RAD = Math.PI / 180;
+const PKEYS = ["tilt", "t", "Lh", "Lk", "Rh", "Rk", "Lab", "Rab", "Ls", "Le", "Rs", "Re", "Lsab", "Rsab", "rise", "air"];
+
+function normPose(p) {
+  const o = {};
+  PKEYS.forEach(k => o[k] = 0);
+  const set = (k, v) => { if (v !== undefined) o[k] = v; };
+  set("tilt", p.tilt); set("t", p.t);
+  set("Lh", p.h); set("Rh", p.h); set("Lk", p.k); set("Rk", p.k);
+  set("Lh", p.Lh); set("Rh", p.Rh); set("Lk", p.Lk); set("Rk", p.Rk);
+  set("Lab", p.ab); set("Rab", p.ab); set("Lab", p.Lab); set("Rab", p.Rab);
+  set("Ls", p.s); set("Rs", p.s); set("Le", p.e); set("Re", p.e);
+  set("Ls", p.Ls); set("Rs", p.Rs); set("Le", p.Le); set("Re", p.Re);
+  set("Lsab", p.sab); set("Rsab", p.sab); set("Lsab", p.Lsab); set("Rsab", p.Rsab);
+  set("rise", p.rise); set("air", p.air);
+  return o;
+}
+
+function lerpPose(a, b, k) {
+  const o = {};
+  PKEYS.forEach(n => o[n] = a[n] + (b[n] - a[n]) * k);
+  return o;
+}
+
+function fk(P) {
+  const L1 = 0.45, L2 = 0.45, T = 0.55, U = 0.3, Fa = 0.27, hw = 0.1, sw = 0.2, foot = 0.22, h0 = 0.08;
+  const th = P.tilt * RAD, ph = P.t * RAD;
+  const rotZ = v => [v[0] * Math.cos(th) + v[1] * Math.sin(th), -v[0] * Math.sin(th) + v[1] * Math.cos(th), v[2]];
+  const add = (a, b, l) => [a[0] + b[0] * l, a[1] + b[1] * l, a[2] + b[2] * l];
+  const dirv = (ang, ab, side) => {
+    const x = Math.sin(ang), y = -Math.cos(ang);
+    const be = -side * ab * RAD;
+    return [x, y * Math.cos(be), y * Math.sin(be)];
+  };
+  const pts = {};
+  const pel = [0, 0, 0], neck = [T * Math.sin(ph), T * Math.cos(ph), 0], head = [(T + 0.2) * Math.sin(ph), (T + 0.2) * Math.cos(ph), 0];
+  const hip = { L: [0, 0, hw], R: [0, 0, -hw] }, sh = { L: [neck[0], neck[1] - 0.03, sw], R: [neck[0], neck[1] - 0.03, -sw] };
+  const side = { L: 1, R: -1 };
+  ["L", "R"].forEach(S => {
+    const a1 = P[S + "h"] * RAD, a2 = (P[S + "h"] - P[S + "k"]) * RAD, ab = P[S + "ab"];
+    const knee = add(hip[S], dirv(a1, ab, side[S]), L1);
+    const ank = add(knee, dirv(a2, ab, side[S]), L2);
+    const g = Math.asin(Math.min(0.99, (h0 + P.rise) / foot));
+    const toe = [ank[0] + foot * Math.cos(g), ank[1] - foot * Math.sin(g), ank[2]];
+    const s1 = P[S + "s"] * RAD, s2 = (P[S + "s"] + P[S + "e"]) * RAD, sab = P[S + "sab"];
+    const elb = add(sh[S], dirv(s1, sab, side[S]), U);
+    const hand = add(elb, dirv(s2, sab, side[S]), Fa);
+    pts["hip" + S] = hip[S]; pts["knee" + S] = knee; pts["ank" + S] = ank; pts["toe" + S] = toe;
+    pts["sh" + S] = sh[S]; pts["elb" + S] = elb; pts["hand" + S] = hand;
+  });
+  pts.pel = pel; pts.neck = neck; pts.head = head; pts.mid = [neck[0] / 2, neck[1] / 2, 0];
+  let minY = 1e9;
+  for (const k in pts) pts[k] = rotZ(pts[k]);
+  for (const k in pts) if (k !== "head") minY = Math.min(minY, pts[k][1]);
+  for (const k in pts) pts[k][1] += -minY + P.air;
+  return pts;
+}
+
+const SEGS = [
+  ["torsoLow", "pel", "mid", 0.17], ["torsoUp", "mid", "neck", 0.2], ["pelvis", "hipL", "hipR", 0.15], ["shoulders", "shL", "shR", 0.11],
+  ["thighL", "hipL", "kneeL", 0.12], ["shinL", "kneeL", "ankL", 0.085], ["thighR", "hipR", "kneeR", 0.12], ["shinR", "kneeR", "ankR", 0.085],
+  ["uarmL", "shL", "elbL", 0.075], ["farmL", "elbL", "handL", 0.062], ["uarmR", "shR", "elbR", 0.075], ["farmR", "elbR", "handR", 0.062],
+  ["footL", "ankL", "toeL", 0.05], ["footR", "ankR", "toeR", 0.05]
+];
+
+function parseCol(s) {
+  s = (s || "").trim();
+  let m = /^#([0-9a-f]{6})$/i.exec(s);
+  if (m) return [0, 2, 4].map(i => parseInt(m[1].slice(i, i + 2), 16));
+  return [126, 140, 224];
+}
+const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+const rgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+
+let ACTIVE_VIEWER = null;
+class Viewer3D {
+  constructor(canvas, opts = {}) {
+    this.c = canvas;
+    this.ctx = canvas.getContext("2d");
+    this.yaw = opts.yaw ?? 35;
+    this.pitch = 12;
+    this.auto = opts.auto ?? true;
+    this.playing = true;
+    this.speedMul = 1;
+    this.tt = 0;
+    this.last = performance.now();
+    this.drag = null;
+    this.modePose = "anim"; // anim, init, final
+    const ro = new ResizeObserver(() => this.size());
+    ro.observe(canvas);
+    this.ro = ro;
+    this.size();
+    canvas.addEventListener("pointerdown", e => {
+      this.drag = { x: e.clientX, yaw: this.yaw };
+      this.auto = false;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener("pointermove", e => {
+      if (this.drag) this.yaw = this.drag.yaw + (e.clientX - this.drag.x) * 0.65;
+    });
+    const up = () => { this.drag = null; };
+    canvas.addEventListener("pointerup", up);
+    canvas.addEventListener("pointercancel", up);
+    this.loop = this.loop.bind(this);
+    requestAnimationFrame(this.loop);
+  }
+  size() {
+    const d = Math.min(2, window.devicePixelRatio || 1);
+    const w = this.c.clientWidth || 320, h = this.c.clientHeight || 280;
+    this.c.width = w * d; this.c.height = h * d;
+    this.dpr = d; this.w = w; this.h = h;
+    if (this.A) this.fit();
+  }
+  setExercise(ex, hlSegs) {
+    this.ex = ex;
+    const p = ex.pose || { A: {}, B: {} };
+    this.A = normPose(p.A || {});
+    this.B = normPose(p.B || {});
+    this.hold = p.hold ? 1 : 0;
+    this.spd = p.spd || 0.4;
+    this.chair = !!(p.chair || (p.A && p.A.chair) || (p.B && p.B.chair));
+    this.hl = new Set(hlSegs || []);
+    this.tt = 0;
+    this.fit();
+  }
+  fit() {
+    let minX = 1e9, maxX = -1e9, maxY = 0, zr = 0.25;
+    [this.A, this.B, lerpPose(this.A, this.B, 0.5)].forEach(P => {
+      const q = fk(P);
+      for (const k in q) {
+        const p = q[k];
+        minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]);
+        maxY = Math.max(maxY, p[1]); zr = Math.max(zr, Math.abs(p[2]));
+      }
+    });
+    this.cx = (minX + maxX) / 2;
+    this.cy = maxY / 2;
+    const ext = Math.max(maxX - minX, zr * 2);
+    this.sc = Math.min(this.h * 0.85 / (maxY + 0.22), this.w * 0.88 / (ext + 0.3));
+    this.chairY = null;
+    if (this.chair) {
+      const P = (this.A.Lh >= this.B.Lh) ? this.A : this.B;
+      this.chairY = fk(P).pel[1] - 0.05;
+    }
+  }
+  loop(now) {
+    if (!this.c.isConnected) { this.ro.disconnect(); return; }
+    const dt = (now - this.last) / 1000;
+    this.last = now;
+    if (this.playing && this.modePose === "anim") this.tt += dt * this.speedMul;
+    if (this.auto && !this.drag) this.yaw += dt * 20;
+    this.draw();
+    requestAnimationFrame(this.loop);
+  }
+  poseAndPhase() {
+    if (this.modePose === "init") return { pose: this.A, phase: "Posición Inicial" };
+    if (this.modePose === "final") return { pose: this.B, phase: "Posición Final" };
+    if (this.hold) {
+      const o = lerpPose(this.A, this.A, 0);
+      o.t += Math.sin(this.tt * 1.6) * 0.8;
+      return { pose: o, phase: "Fase Isométrica (Sostenida)" };
+    }
+    const cycle = (this.tt * this.spd) % 1;
+    const k = (1 - Math.cos(cycle * Math.PI * 2)) / 2;
+    let phase = "Fase Concéntrica";
+    if (cycle < 0.08 || cycle > 0.92) phase = "Posición Inicial";
+    else if (cycle > 0.42 && cycle < 0.58) phase = "Posición Final (Pico)";
+    else if (cycle >= 0.58) phase = "Fase Excéntrica (Retorno)";
+    return { pose: lerpPose(this.A, this.B, k), phase };
+  }
+  proj(p) {
+    const y = this.yaw * RAD, cp = Math.cos(this.pitch * RAD), sp = Math.sin(this.pitch * RAD);
+    const px = p[0] - (this.cx || 0);
+    const x1 = px * Math.cos(y) + p[2] * Math.sin(y), z1 = -px * Math.sin(y) + p[2] * Math.cos(y);
+    const yy = p[1] - (this.cy || 0.9);
+    const y2 = yy * cp - z1 * sp, z2 = yy * sp + z1 * cp;
+    const f = 5, s = f / (f + z2);
+    const sc = this.sc || this.h / 2.35;
+    return { x: this.w / 2 + x1 * s * sc, y: this.h * 0.52 - y2 * s * sc, z: z2, s: s * sc };
+  }
+  css(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  draw() {
+    const ctx = this.ctx;
+    if (!this.A) return;
+    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    ctx.clearRect(0, 0, this.w, this.h);
+    const fig = this.css("--fig") || "#7E8CE0", hl = this.css("--hl") || "#FF4D4D", line = this.css("--line") || "#26387A", ink = this.css("--ink") || "#FFF";
+    const { pose: P, phase } = this.poseAndPhase();
+    const phaseEl = document.getElementById("hud-phase");
+    if (phaseEl) phaseEl.textContent = phase;
+    const pts = fk(P);
+    const c0 = this.proj([0, 0, 0]);
+    ctx.save();
+    ctx.strokeStyle = line;
+    ctx.lineWidth = 1;
+    for (let i = -4; i <= 4; i++) {
+      const a = this.proj([i * 0.3, 0, -1.2]), b = this.proj([i * 0.3, 0, 1.2]);
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.globalAlpha = 0.45; ctx.stroke();
+      const a2 = this.proj([-1.2, 0, i * 0.3]), b2 = this.proj([1.2, 0, i * 0.3]);
+      ctx.beginPath(); ctx.moveTo(a2.x, a2.y); ctx.lineTo(b2.x, b2.y); ctx.stroke();
+    }
+    ctx.restore();
+    if (this.chair && this.chairY != null) {
+      const y = this.chairY;
+      const q = [[-0.28, y, -0.28], [0.28, y, -0.28], [0.28, y, 0.28], [-0.28, y, 0.28]].map(p => this.proj([p[0] - 0.06, p[1], p[2]]));
+      ctx.save(); ctx.fillStyle = line; ctx.globalAlpha = 0.7;
+      ctx.beginPath(); q.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+    const list = [];
+    SEGS.forEach(([id, a, b, w]) => {
+      const A = this.proj(pts[a]), B = this.proj(pts[b]);
+      list.push({ id, A, B, w, z: (A.z + B.z) / 2 });
+    });
+    const H = this.proj(pts.head);
+    list.push({ head: true, H, z: H.z });
+    list.sort((p, q) => q.z - p.z);
+    const TAP = { thighL: [1.25, 0.8], thighR: [1.25, 0.8], shinL: [0.95, 0.6], shinR: [0.95, 0.6], uarmL: [1.1, 0.8], uarmR: [1.1, 0.8], torsoUp: [1.25, 0.9], torsoLow: [0.95, 1.15] };
+    const base = parseCol(fig), mus = parseCol(hl);
+    list.forEach(it => {
+      if (it.head) {
+        const r = 0.115 * it.H.s;
+        ctx.save();
+        const g = ctx.createRadialGradient(it.H.x - r * 0.3, it.H.y - r * 0.3, r * 0.1, it.H.x, it.H.y, r);
+        g.addColorStop(0, rgb(mix(base, [255, 255, 255], 0.35)));
+        g.addColorStop(1, rgb(mix(base, [0, 0, 0], 0.35)));
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(it.H.x, it.H.y, r, 0, 7); ctx.fill();
+        ctx.restore();
+        return;
+      }
+      const on = this.hl.has(it.id);
+      const tp = TAP[it.id] || [1, 1];
+      const ra = Math.max(1.5, it.w * it.A.s * 0.5 * tp[0] * (on ? 1.15 : 1));
+      const rb = Math.max(1.5, it.w * it.B.s * 0.5 * tp[1] * (on ? 1.15 : 1));
+      const dx = it.B.x - it.A.x, dy = it.B.y - it.A.y, d = Math.hypot(dx, dy) || 1e-3, th = Math.atan2(dy, dx);
+      let al = Math.acos(Math.max(-1, Math.min(1, (ra - rb) / d)));
+      if (!isFinite(al)) al = Math.PI / 2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(it.A.x, it.A.y, ra, th + al, th + 2 * Math.PI - al);
+      ctx.arc(it.B.x, it.B.y, rb, th - al, th + al);
+      ctx.closePath();
+      if (on) {
+        const g = ctx.createLinearGradient(it.A.x, it.A.y, it.B.x, it.B.y);
+        const ten = [240, 220, 205];
+        g.addColorStop(0, rgb(ten));
+        g.addColorStop(0.2, rgb(mus));
+        g.addColorStop(0.8, rgb(mus));
+        g.addColorStop(1, rgb(ten));
+        ctx.fillStyle = g;
+      } else {
+        ctx.fillStyle = rgb(base);
+      }
+      ctx.fill();
+      ctx.restore();
+    });
+    ctx.save();
+    ctx.fillStyle = ink; ctx.globalAlpha = 0.6;
+    ["kneeL", "kneeR", "elbL", "elbR", "hipL", "hipR", "shL", "shR"].forEach(k => {
+      if (!pts[k]) return;
+      const p = this.proj(pts[k]);
+      ctx.beginPath(); ctx.arc(p.x, p.y, 2.4, 0, 7); ctx.fill();
+    });
+    ctx.restore();
+  }
+}
+
+function segsOfEx(ex) {
+  const s = new Set();
+  (ex.mus || []).forEach(m => MUSCLES[m] && MUSCLES[m].seg.forEach(x => s.add(x)));
+  return [...s];
+}
+
+/* ===== ICONOS SVG ===== */
+const ICONS = {
+  home: "M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
+  dumbbell: "M6 6v12M3 9v6M18 6v12M21 9v6M6 12h12",
+  list: "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01",
+  chart: "M4 20V4M4 20h16M8 16v-5M12 16V8M16 16v-3",
+  body: "M12 3.5a1.8 1.8 0 1 0 .01 0M12 8v6.5M7 11l5-3 5 3M9 21l3-6.5 3 6.5",
+  leaf: "M5 19C5 9 11 4 20 4c0 9-5 15-15 15zM5 19l8-8",
+  user: "M12 12a4 4 0 1 0 .01 0M4 21c0-4 4-6 8-6s8 2 8 6",
+  doc: "M6 3h9l4 4v14H6zM9 12h7M9 16h7",
+  back: "M15 5l-7 7 7 7",
+  play: "M7 4l13 8-13 8z",
+  pause: "M8 4v16M16 4v16",
+  plus: "M12 5v14M5 12h14",
+  check: "M5 12l5 5 9-10",
+  calc: "M5 3h14v18H5zM8 7h8M8 12h2M12 12h2M8 16h2M12 16h2",
+  scan: "M4 4h5M4 4v5M20 4h-5M20 4v5M4 20h5M4 20v-5M20 20h-5M20 20v-5M8 12h8",
+  timer: "M12 8v5l3 2M9 2h6M12 21a8 8 0 1 0 .01 0",
+  video: "M3 6h12v12H3zM15 10l6-3v10l-6-3",
+  trash: "M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13",
+  info: "M12 8h.01M11 12h1v5h1M12 3a9 9 0 1 0 .01 0"
+};
+const ic = (n, sz = 20) => `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${ICONS[n] || ICONS.info}"/></svg>`;
+
+/* ===== NAVEGACIÓN PRINCIPAL ===== */
+function applyPrefs() {
+  document.documentElement.setAttribute("data-theme", S.theme || "dark");
+  document.documentElement.style.setProperty("--fs", S.bigText ? "18.5px" : "16px");
+}
+
+function navigate(screen, param = null) {
+  UI.stack.push({ screen: UI.screen, param: UI.param });
+  UI.screen = screen;
+  UI.param = param;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function switchTab(screen) {
+  UI.stack = [];
+  UI.screen = screen;
+  UI.param = null;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function goBack() {
+  if (UI.stack.length) {
+    const prev = UI.stack.pop();
+    UI.screen = prev.screen;
+    UI.param = prev.param;
+    render();
+  } else {
+    switchTab("home");
+  }
+}
+
+/* ===== VISTAS DE LA APLICACIÓN ===== */
+function render() {
+  applyPrefs();
+  const root = document.getElementById("app");
+  if (!S.loggedIn && ["welcome", "login", "register", "forgot"].includes(UI.screen)) {
+    root.innerHTML = renderAuth();
+    afterRender();
+    return;
+  }
+
+  const deep = UI.stack.length > 0;
+  const titles = {
+    home: "PhysioMotion 3D", lib: t("lib"), routines: t("routines"), progress: t("progress"),
+    anatomy: t("anatomy"), edu: t("edu"), profile: t("profile"), pro: t("pro"),
+    exDetail: getEx(UI.param)?.n[S.lang] || "Ejercicio 3D",
+    execRoutine: "Ejecución en Curso", logActivity: "Registrar mi Actividad",
+    dose: t("doseCalc"), scanner: t("scanner"), timer: t("timer"), routes: t("routes"),
+    newEx: "Crear Ejercicio Propio"
+  };
+
+  root.innerHTML = `
+    <header class="topbar">
+      ${deep ? `<button class="iconbtn" onclick="goBack()" aria-label="Volver">${ic("back")}</button>` : `
+      <span class="iconbtn" style="background:var(--purple);color:#fff;border:none">3D</span>`}
+      <h1>${esc(titles[UI.screen] || "PhysioMotion 3D")}</h1>
+      <button class="iconbtn" onclick="cycleLang()" title="Cambiar idioma (Paso 5)">${S.lang.toUpperCase()}</button>
+      <button class="iconbtn" onclick="toggleTheme()" title="Tema Oscuro/Claro">${S.theme === "dark" ? "☀️" : "🌙"}</button>
+    </header>
+    <main class="view">${renderScreen()}</main>
+    <div class="tabbar">
+      <nav aria-label="Navegación principal">
+        <button class="${UI.screen === "home" ? "on" : ""}" onclick="switchTab('home')">${ic("home", 22)}<span>${t("home")}</span></button>
+        <button class="${["lib", "exDetail", "newEx"].includes(UI.screen) ? "on" : ""}" onclick="switchTab('lib')">${ic("dumbbell", 22)}<span>${t("lib")}</span></button>
+        <button class="${["routines", "execRoutine"].includes(UI.screen) ? "on" : ""}" onclick="switchTab('routines')">${ic("list", 22)}<span>${t("routines")}</span></button>
+        <button class="${["progress", "logActivity"].includes(UI.screen) ? "on" : ""}" onclick="switchTab('progress')">${ic("chart", 22)}<span>${t("progress")}</span></button>
+        <button class="${["anatomy", "edu", "profile", "pro", "dose", "scanner", "timer", "routes"].includes(UI.screen) ? "on" : ""}" onclick="switchTab('anatomy')">${ic("body", 22)}<span>3D / Más</span></button>
+      </nav>
+    </div>
+  `;
+  afterRender();
+}
+
+/* ===== PASO 1, 2 Y 3 DEL PPT: BIENVENIDA, REGISTRO E INICIO DE SESIÓN ===== */
+function renderAuth() {
+  if (UI.screen === "welcome") {
+    return `
+      <div class="view" style="padding-top:20px">
+        <div class="auth-hero">
+          <span class="tag teal">GUÍA OFICIAL V1.0 · PROTOTIPO INTEGRADO</span>
+          <h1 style="font-size:2rem;color:var(--accent)">PhysioMotion 3D</h1>
+          <p style="font-weight:700">${t("tagline")}</p>
+          <p class="small muted">${t("welcomeSub")}</p>
+          <div class="stage" style="width:100%;margin:8px 0"><canvas id="auth3d" style="height:220px"></canvas></div>
+          <button class="btn block" onclick="UI.screen='login';render()">${t("login").toUpperCase()}</button>
+          <button class="btn alt block" onclick="UI.screen='register';render()">${t("register").toUpperCase()}</button>
+        </div>
+        <div class="card flat">
+          <h3>Dispositivos y Requisitos (Pág. 4)</h3>
+          <div class="chips" style="margin-top:8px">
+            <span class="chip static">📱 Android / iOS</span>
+            <span class="chip static">💻 Navegador Web</span>
+            <span class="chip static">⌚ Apple Watch (Modo Reloj)</span>
+          </div>
+          <p class="small muted" style="margin-top:8px">Uso responsable: PhysioMotion 3D no diagnostica lesiones ni sustituye la atención de un profesional de salud.</p>
+        </div>
+      </div>`;
+  }
+  if (UI.screen === "login") {
+    return `
+      <div class="view" style="padding-top:20px">
+        <div class="card neon">
+          <h2>${t("login")} (Paso 3)</h2>
+          <p class="small muted" style="margin-top:4px">Ingresa con tu cuenta o usa el acceso directo de demostración.</p>
+          <form onsubmit="handleLogin(event)" class="view" style="margin-top:14px">
+            <label class="f">Correo electrónico<input type="email" id="lg_email" required value="${esc(S.user.email)}"></label>
+            <label class="f">Contraseña<input type="password" id="lg_pass" required value="123456"></label>
+            <div class="row spread">
+              <button type="button" class="chip" onclick="UI.screen='forgot';render()">${t("forgot")}</button>
+            </div>
+            <button type="submit" class="btn block">${t("enter").toUpperCase()}</button>
+            <button type="button" class="btn ghost block" onclick="UI.screen='welcome';render()">Volver</button>
+          </form>
+        </div>
+      </div>`;
+  }
+  if (UI.screen === "forgot") {
+    return `
+      <div class="view" style="padding-top:20px">
+        <div class="card">
+          <h2>Recuperar contraseña (Paso 3)</h2>
+          <p class="small muted" style="margin-top:6px">Introduce tu correo electrónico registrado para recibir las instrucciones de restablecimiento.</p>
+          <form onsubmit="event.preventDefault();toast('Instrucciones enviadas a tu correo');UI.screen='login';render();" class="view" style="margin-top:12px">
+            <label class="f">Correo registrado<input type="email" required placeholder="correo@ejemplo.com"></label>
+            <button type="submit" class="btn block">Enviar instrucciones</button>
+            <button type="button" class="btn ghost block" onclick="UI.screen='login';render()">Volver al inicio de sesión</button>
+          </form>
+        </div>
+      </div>`;
+  }
+  return `
+    <div class="view" style="padding-top:16px">
+      <div class="card neon">
+        <h2>Formulario de Registro (Paso 2)</h2>
+        <form onsubmit="handleRegister(event)" class="view" style="margin-top:12px">
+          <label class="f">Nombres y apellidos<input type="text" id="rg_name" required placeholder="Ej. Ana Pérez"></label>
+          <label class="f">Fecha de nacimiento<input type="date" id="rg_dob" required value="2003-04-15"></label>
+          <label class="f">Correo electrónico<input type="email" id="rg_email" required placeholder="usuario@correo.com"></label>
+          <label class="f">Contraseña<input type="password" id="rg_pass" required minlength="6" placeholder="Mínimo 6 caracteres"></label>
+          <label class="f">Tipo de usuario
+            <select id="rg_role">
+              <option value="Paciente">Paciente</option>
+              <option value="Deportista">Deportista</option>
+              <option value="Fisioterapeuta">Fisioterapeuta</option>
+            </select>
+          </label>
+          <label class="f">Idioma de preferencia
+            <select id="rg_lang">
+              <option value="es">Español</option>
+              <option value="en">English (Inglés)</option>
+              <option value="de">Deutsch (Alemán)</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" id="rg_terms" required> <span>Acepto las condiciones de uso y política de privacidad.</span></label>
+          <label class="check"><input type="checkbox" id="rg_minor"> <span>Si el usuario es menor de edad, cuento con autorización de sus padres o tutores (Pág. 6 y 19).</span></label>
+          <button type="submit" class="btn block">${t("registerBtn").toUpperCase()}</button>
+          <button type="button" class="btn ghost block" onclick="UI.screen='welcome';render()">Cancelar</button>
+        </form>
+      </div>
+    </div>`;
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  S.user.email = document.getElementById("lg_email").value.trim();
+  S.loggedIn = true;
+  save();
+  UI.screen = "home";
+  toast("Bienvenido a PhysioMotion 3D");
+  render();
+}
+
+function handleRegister(e) {
+  e.preventDefault();
+  const dob = document.getElementById("rg_dob").value;
+  const age = dob ? Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 86400000)) : 22;
+  if (age < 18 && !document.getElementById("rg_minor").checked) {
+    toast("Los menores de edad requieren marcar la autorización de padres o tutores.");
+    return;
+  }
+  S.user.name = document.getElementById("rg_name").value.trim();
+  S.user.dob = dob;
+  S.user.email = document.getElementById("rg_email").value.trim();
+  S.user.role = document.getElementById("rg_role").value;
+  S.lang = document.getElementById("rg_lang").value;
+  S.loggedIn = true;
+  save();
+  UI.screen = "home";
+  toast("Cuenta creada y verificada correctamente");
+  render();
+}
+
+/* ===== ENRUTADOR DE PANTALLAS INTERNAS ===== */
+function renderScreen() {
+  switch (UI.screen) {
+    case "home": return renderHome();
+    case "lib": return renderLibrary();
+    case "exDetail": return renderExDetail(UI.param);
+    case "newEx": return renderNewEx();
+    case "routines": return renderRoutines();
+    case "execRoutine": return renderExecRoutine();
+    case "logActivity": return renderLogActivity();
+    case "progress": return renderProgress();
+    case "anatomy": return renderAnatomy();
+    case "edu": return renderEducation();
+    case "profile": return renderProfile();
+    case "pro": return renderProfessional();
+    case "dose": return renderDoseCalc();
+    case "scanner": return renderScanner();
+    case "timer": return renderWatchTimer();
+    case "routes": return renderRoutes();
+    default: return renderHome();
+  }
+}
+
+/* ===== PASO 6 DEL PPT: PANTALLA PRINCIPAL CON LOS 8 MÓDULOS ===== */
+function renderHome() {
+  const activeR = PRESET_ROUTINES.find(r => r.id === S.activeRoutineId) || PRESET_ROUTINES[0];
+  const totalMins = S.logs.reduce((a, b) => a + (+b.duration || 0), 0);
+  return `
+    <section class="hero">
+      <div class="row spread">
+        <span class="tag" style="background:rgba(0,0,0,0.3);color:#fff">${esc(S.user.role)} · ${esc(S.user.activity)}</span>
+        <span class="tag teal">Paso 6 · Panel Principal</span>
+      </div>
+      <h1>Hola, ${esc(S.user.name)}</h1>
+      <p class="small" style="opacity:0.9">Programa asignado hoy: <b>${esc(activeR.title[S.lang] || activeR.title.es)}</b> (${esc(activeR.objective)})</p>
+      <div class="row wrap" style="margin-top:6px">
+        <button class="btn" onclick="startRoutineSession('${activeR.id}')">${ic("play", 18)} ${t("startSession")}</button>
+        <button class="btn ghost" style="background:rgba(0,0,0,0.28);color:#fff;border-color:rgba(255,255,255,0.4)" onclick="navigate('logActivity')">${t("logSession")}</button>
+      </div>
+    </section>
+
+    <div class="grid2">
+      <div class="stat"><b>${S.logs.length}</b><span>Sesiones completadas</span></div>
+      <div class="stat"><b>${totalMins} min</b><span>Tiempo activo acumulado</span></div>
+    </div>
+
+    <h2>Los 8 Módulos Principales (Paso 6 PPT)</h2>
+    <div class="grid4">
+      <button class="tile" onclick="switchTab('home')"><span class="ico">${ic("home")}</span><b>1. ${t("home")}</b><span class="small muted">Resumen y accesos</span></button>
+      <button class="tile" onclick="switchTab('lib')"><span class="ico">${ic("dumbbell")}</span><b>2. ${t("lib")}</b><span class="small muted">Biblioteca 3D (6 categorías)</span></button>
+      <button class="tile" onclick="switchTab('routines')"><span class="ico">${ic("list")}</span><b>3. ${t("routines")}</b><span class="small muted">Tobillo, Hombro, Cadera</span></button>
+      <button class="tile" onclick="switchTab('progress')"><span class="ico">${ic("chart")}</span><b>4. ${t("progress")}</b><span class="small muted">Calendario y evolución</span></button>
+      <button class="tile" onclick="switchTab('anatomy')"><span class="ico">${ic("body")}</span><b>5. ${t("anatomy")}</b><span class="small muted">Mapa muscular 3D</span></button>
+      <button class="tile" onclick="navigate('edu')"><span class="ico">${ic("leaf")}</span><b>6. ${t("edu")}</b><span class="small muted">Hidratación y nutrición</span></button>
+      <button class="tile" onclick="navigate('profile')"><span class="ico">${ic("user")}</span><b>7. ${t("profile")}</b><span class="small muted">Objetivos e idioma</span></button>
+      <button class="tile" onclick="navigate('pro')"><span class="ico">${ic("doc")}</span><b>8. ${t("pro")}</b><span class="small muted">Panel Fisioterapeuta</span></button>
+    </div>
+
+    <h2>Herramientas Clínicas Complementarias</h2>
+    <div class="grid2">
+      <button class="item" onclick="navigate('dose')"><span class="ico">${ic("calc")}</span><span class="grow"><span class="nm">${t("doseCalc")}</span><br><span class="small muted">Series, repeticiones y alertas</span></span></button>
+      <button class="item" onclick="navigate('scanner')"><span class="ico">${ic("scan")}</span><span class="grow"><span class="nm">${t("scanner")}</span><br><span class="small muted">Postura y ángulos en foto</span></span></button>
+      <button class="item" onclick="navigate('routes')"><span class="ico">${ic("list")}</span><span class="grow"><span class="nm">${t("routes")}</span><br><span class="small muted">Infantil, Mayor, Deportista…</span></span></button>
+      <button class="item" onclick="navigate('timer')"><span class="ico">${ic("timer")}</span><span class="grow"><span class="nm">${t("timer")}</span><br><span class="small muted">Apple Watch / Cronómetro</span></span></button>
+    </div>
+  `;
+}
+
+/* ===== PASO 7 DEL PPT: BUSCAR UN EJERCICIO Y 6 CATEGORÍAS ===== */
+function renderLibrary() {
+  const q = UI.q.trim().toLowerCase();
+  const list = allEx().filter(e => {
+    if (UI.pptCat !== "all" && e.pptCat !== UI.pptCat) return false;
+    if (q) {
+      const hay = [exName(e), e.obj, ...(e.mus || []).map(m => MUSCLES[m] ? mName(MUSCLES[m]) : "")].join(" ").toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  return `
+    <input class="search" type="search" placeholder="${t("search")}" value="${esc(UI.q)}" oninput="UI.q=this.value;render()">
+    <div class="chips">
+      <button class="chip ${UI.pptCat === "all" ? "on" : ""}" onclick="UI.pptCat='all';render()">${t("all")}</button>
+      ${Object.entries(PPT_CATS).map(([k, v]) => `
+        <button class="chip ${UI.pptCat === k ? "on" : ""}" onclick="UI.pptCat='${k}';render()">${esc(v[S.lang] || v.es)}</button>
+      `).join("")}
+    </div>
+    <div class="row spread">
+      <span class="small muted">${list.length} ejercicios disponibles en 3D</span>
+      <button class="btn sm alt" onclick="navigate('newEx')">${ic("plus", 16)} Ejercicio / Video propio</button>
+    </div>
+    <div class="list">
+      ${list.map(e => `
+        <button class="item" onclick="navigate('exDetail','${e.id}')">
+          <span class="ico">${ic("dumbbell")}</span>
+          <span class="grow">
+            <span class="nm">${esc(exName(e))}</span><br>
+            <span class="small muted">${esc(PPT_CATS[e.pptCat]?.[S.lang] || PPT_CATS[e.pptCat]?.es || "General")} · ${esc(CT[e.ct] || "")}</span>
+          </span>
+          <span class="tag teal">Ver 3D</span>
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+/* ===== PASO 8 DEL PPT: VISUALIZACIÓN 3D DEL MOVIMIENTO ===== */
+function renderExDetail(id) {
+  const e = getEx(id);
+  return `
+    <div class="stage">
+      <div class="hud-top">
+        <span class="badge3d" id="hud-phase">Fase Concéntrica</span>
+        <span class="badge3d">${esc(CT[e.ct] || "3D")}</span>
+      </div>
+      <canvas id="ex3d"></canvas>
+      <div class="bar">
+        <button class="chip" onclick="setViewerPose('anim')">▶ Animación 3D</button>
+        <button class="chip" onclick="setViewerPose('init')">Posición Inicial</button>
+        <button class="chip" onclick="setViewerPose('final')">Posición Final</button>
+        <button class="chip" onclick="setViewerAngle(90)">${t("front")}</button>
+        <button class="chip" onclick="setViewerAngle(0)">${t("side")}</button>
+        <button class="chip" onclick="setViewerAngle(270)">${t("back_")}</button>
+        <button class="chip" onclick="toggleViewerPlay()">⏯ Pausar/Reproducir</button>
+        <button class="chip" onclick="toggleViewerSpin()">🔄 ${t("spin")}</button>
+      </div>
+    </div>
+
+    <div class="card neon">
+      <h3>Análisis Biomecánico 3D (Paso 8)</h3>
+      <div class="list" style="margin-top:8px">
+        <div class="small"><b>• Posición inicial:</b> ${esc(e.initPos || "Postura alineada de partida.")}</div>
+        <div class="small"><b>• Posición final:</b> ${esc(e.finalPos || "Rango final controlado sin compensación.")}</div>
+        <div class="small"><b>• Dirección del movimiento:</b> ${esc(e.dirMov || "Desplazamiento controlado en el plano anatómico.")}</div>
+        <div class="small"><b>• Fase de contracción:</b> ${esc(CT[e.ct] || "Dinámica")}</div>
+      </div>
+      <div class="chips" style="margin-top:10px">
+        ${(e.mus || []).map(m => MUSCLES[m] ? `<button class="chip on" onclick="UI.mreg='${MUSCLES[m].reg}';switchTab('anatomy')">💪 ${esc(mName(MUSCLES[m]))}</button>` : "").join("")}
+      </div>
+    </div>
+
+    <div class="tabs">
+      ${[["steps", t("steps")], ["dosing", t("dosing")], ["videos", t("videos")], ["safety", t("safety")], ["sources", t("sources")]].map(([k, l]) => `
+        <button class="${UI.exTab === k ? "on" : ""}" onclick="UI.exTab='${k}';render()">${l}</button>
+      `).join("")}
+    </div>
+
+    ${UI.exTab === "steps" ? `
+      <div class="card">
+        <h3>Instrucciones paso a paso</h3>
+        <p class="small muted" style="margin:4px 0 10px">${esc(e.obj)}</p>
+        <ol class="steps">${(e.steps || []).map(s => `<li>${esc(s)}</li>`).join("")}</ol>
+        <p class="small muted" style="margin-top:10px"><b>Respiración:</b> ${esc(e.breath || "Fluida y sin contener el aire.")}</p>
+      </div>
+    ` : UI.exTab === "dosing" ? `
+      <div class="card">
+        <h3>Dosificación Estándar</h3>
+        <p class="small" style="margin-top:6px"><b>Series:</b> 2 a 3 · <b>Repeticiones/Tiempo:</b> ${e.ct === "iso" ? "30 s sostenidos" : "8 a 12 reps"} · <b>Descanso:</b> 60 s</p>
+        <div class="row wrap" style="margin-top:12px">
+          <button class="btn sm" onclick="addExToCustomRoutine('${e.id}')">${ic("plus", 16)} Añadir a Mi Rutina</button>
+          <button class="btn sm alt" onclick="UI.dose.ex='${e.id}';navigate('dose')">Personalizar en Calculadora</button>
+        </div>
+      </div>
+    ` : UI.exTab === "videos" ? `
+      <div class="card">
+        <h3>Videos de referencia en tu dispositivo</h3>
+        <p class="small muted" style="margin-top:4px">Sube el video grabado con tu fisioterapeuta (se guarda localmente en IndexedDB).</p>
+        <input type="file" id="vid_input" accept="video/*" hidden onchange="handleVideoUpload(event,'${e.id}')">
+        <label for="vid_input" class="btn sm block" style="margin-top:10px;cursor:pointer">📹 Subir video para este ejercicio</label>
+        <div id="vid_list" class="list" style="margin-top:12px"></div>
+      </div>
+    ` : UI.exTab === "safety" ? `
+      <div class="card">
+        <h3>Errores frecuentes y Contraindicaciones</h3>
+        <ul class="dots" style="margin-top:8px">${(e.err || []).map(x => `<li>Error a evitar: ${esc(x)}</li>`).join("")}</ul>
+        <div class="alert warn" style="margin-top:10px"><span><b>Precaución:</b> ${(e.contra || []).join(", ")}. Detén el ejercicio si aparece dolor intenso, mareo o dificultad respiratoria (Pág. 19).</span></div>
+      </div>
+    ` : `
+      <div class="card">
+        <h3>Evidencia y Fuentes Clínicas</h3>
+        ${REFS.map(r => `<div class="card flat" style="margin-top:8px"><b>${esc(r.title)}</b><div class="small muted">${esc(r.org)}</div><ul class="dots" style="margin-top:6px">${r.pts.map(p => `<li class="small">${esc(p)}</li>`).join("")}</ul></div>`).join("")}
+      </div>
+    `}
+  `;
+}
+
+function setViewerPose(mode) { if (ACTIVE_VIEWER) ACTIVE_VIEWER.modePose = mode; }
+function setViewerAngle(yaw) { if (ACTIVE_VIEWER) { ACTIVE_VIEWER.modePose = "anim"; ACTIVE_VIEWER.yaw = yaw; ACTIVE_VIEWER.auto = false; } }
+function toggleViewerPlay() { if (ACTIVE_VIEWER) { ACTIVE_VIEWER.modePose = "anim"; ACTIVE_VIEWER.playing = !ACTIVE_VIEWER.playing; } }
+function toggleViewerSpin() { if (ACTIVE_VIEWER) ACTIVE_VIEWER.auto = !ACTIVE_VIEWER.auto; }
+
+async function handleVideoUpload(ev, exId) {
+  const f = ev.target.files[0];
+  if (!f) return;
+  await saveVideoRecord({ id: "v_" + Date.now(), ex: exId, title: f.name, blob: f, date: new Date().toLocaleDateString() });
+  toast("Video guardado en este dispositivo");
+  loadVideoList(exId);
+}
+
+async function loadVideoList(exId) {
+  const box = document.getElementById("vid_list");
+  if (!box) return;
+  const vids = await getVideosByEx(exId);
+  if (!vids.length) {
+    box.innerHTML = `<p class="small muted">No hay videos guardados todavía para este ejercicio.</p>`;
+    return;
+  }
+  box.innerHTML = vids.map(v => {
+    const url = URL.createObjectURL(v.blob);
+    return `<div class="card flat"><video src="${url}" controls playsinline style="width:100%;border-radius:10px;max-height:240px;background:#000"></video><div class="row spread" style="margin-top:6px"><b class="small">${esc(v.title)}</b><button class="btn danger sm" onclick="removeVideo('${v.id}','${exId}')">Eliminar</button></div></div>`;
+  }).join("");
+}
+
+async function removeVideo(id, exId) {
+  await deleteVideoRecord(id);
+  loadVideoList(exId);
+}
+
+function renderNewEx() {
+  return `
+    <div class="card">
+      <h2>Agregar Ejercicio Propio</h2>
+      <form onsubmit="saveCustomEx(event)" class="view" style="margin-top:12px">
+        <label class="f">Nombre del ejercicio<input type="text" id="cx_name" required placeholder="Ej. Rotación externa con banda"></label>
+        <label class="f">Categoría (Paso 7 PPT)
+          <select id="cx_cat">${Object.entries(PPT_CATS).map(([k, v]) => `<option value="${k}">${v.es}</option>`).join("")}</select>
+        </label>
+        <label class="f">Tipo de contracción
+          <select id="cx_ct">${Object.entries(CT).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select>
+        </label>
+        <label class="f">Músculo principal
+          <select id="cx_mus">${Object.entries(MUSCLES).map(([k, m]) => `<option value="${k}">${m.n.es}</option>`).join("")}</select>
+        </label>
+        <label class="f">Instrucciones (una por línea)<textarea id="cx_steps" placeholder="Paso 1...\nPaso 2..."></textarea></label>
+        <button type="submit" class="btn block">Guardar en la biblioteca</button>
+      </form>
+    </div>
+  `;
+}
+
+function saveCustomEx(e) {
+  e.preventDefault();
+  const name = document.getElementById("cx_name").value.trim();
+  const id = "custom_" + Date.now();
+  S.customEx.push({
+    id, n: { es: name, en: name, de: name },
+    pptCat: document.getElementById("cx_cat").value,
+    cat: "fuerza", ct: document.getElementById("cx_ct").value,
+    mus: [document.getElementById("cx_mus").value],
+    pose: { A: { s: 10 }, B: { s: 85 }, spd: 0.4 },
+    initPos: "Posición inicial controlada.", finalPos: "Rango completo sin dolor.", dirMov: "Ejecución lenta.",
+    obj: "Ejercicio personalizado añadido por el usuario.",
+    steps: document.getElementById("cx_steps").value.split("\n").filter(Boolean)
+  });
+  save();
+  toast("Ejercicio agregado");
+  navigate("exDetail", id);
+}
+
+/* ===== PASO 9 DEL PPT: ACCEDER A "MIS RUTINAS" ===== */
+function renderRoutines() {
+  const curR = PRESET_ROUTINES.find(r => r.id === UI.routineId) || PRESET_ROUTINES[0];
+  return `
+    <div class="card flat">
+      <p class="small">La dosis de ejercicio corresponde a la indicación individual del profesional cuando se trate de rehabilitación (Paso 9 del Manual).</p>
+    </div>
+
+    <div class="list">
+      ${PRESET_ROUTINES.map(r => `
+        <div class="card ${UI.routineId === r.id ? "neon" : ""}">
+          <div class="row spread">
+            <span class="tag teal">${esc(r.badge)}</span>
+            <span class="small muted">⏱ ${esc(r.duration)}</span>
+          </div>
+          <h2 style="margin-top:6px">${esc(r.title[S.lang] || r.title.es)}</h2>
+          <p class="small" style="margin-top:4px"><b>Objetivo terapéutico:</b> ${esc(r.objective)}</p>
+          <p class="small muted" style="margin-top:2px"><b>Intensidad:</b> ${esc(r.intensity)}</p>
+          <div class="row wrap" style="margin-top:10px">
+            <button class="btn sm" onclick="UI.routineId='${r.id}';S.activeRoutineId='${r.id}';save();render()">${t("viewRoutine")}</button>
+            <button class="btn sm purple" onclick="startRoutineSession('${r.id}')">${ic("play", 16)} ${t("startSession")}</button>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+
+    <div class="card">
+      <h2>Detalle: ${esc(curR.title[S.lang] || curR.title.es)}</h2>
+      <p class="small muted" style="margin-top:4px"><b>Observación clínica:</b> ${esc(curR.physioNote)}</p>
+      <div class="list" style="margin-top:12px">
+        ${curR.items.map((it, idx) => {
+          const ex = getEx(it.ex);
+          return `
+            <div class="card flat">
+              <div class="row spread">
+                <b>${idx + 1}. ${esc(exName(ex))}</b>
+                <button class="chip" onclick="navigate('exDetail','${ex.id}')">Ver en 3D</button>
+              </div>
+              <div class="small" style="margin-top:6px;color:var(--accent);font-weight:800">
+                Series: ${it.sets} | ${it.unit === "s" ? "Tiempo: " + it.hold + "s" : "Repeticiones: " + it.reps} | Descanso: ${it.rest}s
+              </div>
+              <p class="small muted" style="margin-top:4px">Ejecución: ${esc(it.note)}</p>
+            </div>`;
+        }).join("")}
+      </div>
+      <button class="btn block" style="margin-top:12px" onclick="startRoutineSession('${curR.id}')">${ic("play", 18)} ${t("startSession")}</button>
+    </div>
+  `;
+}
+
+function addExToCustomRoutine(exId) {
+  PRESET_ROUTINES[0].items.push({ ex: exId, sets: 3, reps: 10, hold: 0, rest: 60, unit: "rep", note: "Agregado desde la biblioteca." });
+  toast("Añadido a tu rutina activa");
+}
+
+/* ===== PASO 10 DEL PPT: EJECUTAR MI RUTINA (CON MODELO 3D, CONTADOR 08 REPS Y TEMPORIZADOR 60S) ===== */
+let execInterval = null;
+function startRoutineSession(rId) {
+  const r = PRESET_ROUTINES.find(x => x.id === rId) || PRESET_ROUTINES[0];
+  UI.exec = {
+    routine: r,
+    idx: 0,
+    set: 1,
+    repsLeft: r.items[0].unit === "s" ? r.items[0].hold : r.items[0].reps,
+    resting: false,
+    restLeft: r.items[0].rest,
+    restTotal: r.items[0].rest,
+    startedAt: Date.now()
+  };
+  clearInterval(execInterval);
+  execInterval = setInterval(tickExecSession, 1000);
+  navigate("execRoutine");
+}
+
+function tickExecSession() {
+  if (UI.screen !== "execRoutine" || !UI.exec) return;
+  const exState = UI.exec;
+  const item = exState.routine.items[exState.idx];
+  if (exState.resting) {
+    exState.restLeft = Math.max(0, exState.restLeft - 1);
+    const rEl = document.getElementById("exec_rest_val");
+    const ringEl = document.getElementById("exec_ring");
+    if (rEl) rEl.textContent = exState.restLeft + "s";
+    if (ringEl) ringEl.style.setProperty("--p", Math.round(100 * (1 - exState.restLeft / (exState.restTotal || 60))));
+    if (exState.restLeft === 0) {
+      beep(980, 0.25);
+      exState.resting = false;
+      render();
+    }
+  } else if (item.unit === "s" && exState.repsLeft > 0) {
+    exState.repsLeft = Math.max(0, exState.repsLeft - 1);
+    const cEl = document.getElementById("exec_rep_val");
+    if (cEl) cEl.textContent = String(exState.repsLeft).padStart(2, "0");
+    if (exState.repsLeft === 0) beep(880, 0.2);
+  }
+}
+
+function renderExecRoutine() {
+  const st = UI.exec;
+  if (!st) return `<div class="card">No hay sesión activa.</div>`;
+  const item = st.routine.items[st.idx];
+  const ex = getEx(item.ex);
+  return `
+    <div class="card neon">
+      <div class="row spread">
+        <span class="tag teal">EJECUCIÓN EN CURSO (PASO 10)</span>
+        <span class="small muted">Ejercicio ${st.idx + 1} de ${st.routine.items.length}</span>
+      </div>
+      <h2 style="margin-top:6px">${esc(exName(ex))}</h2>
+      <p class="small muted">Serie ${st.set} de ${item.sets} · ${esc(item.note)}</p>
+    </div>
+
+    <div class="stage">
+      <div class="hud-top"><span class="badge3d" id="hud-phase">Demostración 3D</span></div>
+      <canvas id="exec3d" style="height:230px"></canvas>
+    </div>
+
+    ${st.resting ? `
+      <div class="card" style="text-align:center">
+        <h3>Tiempo de Descanso</h3>
+        <div class="ring" id="exec_ring" style="margin:12px auto;--p:0">
+          <div>
+            <b id="exec_rest_val">${st.restLeft}s</b>
+            <span class="small muted">Descanso</span>
+          </div>
+        </div>
+        <button class="btn sm alt" onclick="UI.exec.resting=false;render()">Saltar descanso</button>
+      </div>
+    ` : `
+      <div class="card" style="text-align:center">
+        <div class="ring" style="--p:${Math.round((st.set / item.sets) * 100)};margin:6px auto">
+          <div>
+            <b id="exec_rep_val">${String(st.repsLeft).padStart(2, "0")}</b>
+            <span class="small muted">${item.unit === "s" ? "SEGUNDOS" : "REPS"}</span>
+          </div>
+        </div>
+        <p class="small muted" style="margin-top:8px">Descanso programado: <b>${item.rest}s</b></p>
+        <div class="row" style="justify-content:center;margin-top:10px">
+          ${item.unit !== "s" ? `<button class="btn sm ghost" onclick="if(UI.exec.repsLeft>0)UI.exec.repsLeft--;render()">-1 Rep</button>` : ""}
+          <button class="btn teal" onclick="completeExecSet()">✓ Completar serie ${st.set}/${item.sets}</button>
+        </div>
+      </div>
+    `}
+
+    <div class="row wrap">
+      <button class="btn purple block" onclick="nextExecExercise()">${t("nextEx").toUpperCase()} ➔</button>
+      <button class="btn ghost block" onclick="finishExecToLog()">Finalizar y Registrar Actividad (Paso 11)</button>
+    </div>
+  `;
+}
+
+function completeExecSet() {
+  const st = UI.exec;
+  const item = st.routine.items[st.idx];
+  beep(740, 0.12);
+  if (st.set < item.sets) {
+    st.set++;
+    st.repsLeft = item.unit === "s" ? item.hold : item.reps;
+    st.resting = true;
+    st.restLeft = item.rest;
+    st.restTotal = item.rest;
+    render();
+  } else {
+    nextExecExercise();
+  }
+}
+
+function nextExecExercise() {
+  const st = UI.exec;
+  if (st.idx < st.routine.items.length - 1) {
+    st.idx++;
+    const nextItem = st.routine.items[st.idx];
+    st.set = 1;
+    st.repsLeft = nextItem.unit === "s" ? nextItem.hold : nextItem.reps;
+    st.resting = false;
+    render();
+  } else {
+    finishExecToLog();
+  }
+}
+
+function finishExecToLog() {
+  clearInterval(execInterval);
+  navigate("logActivity");
+}
+
+/* ===== PASO 11 DEL PPT: REGISTRAR MI ACTIVIDAD ===== */
+function renderLogActivity() {
+  const r = UI.exec ? UI.exec.routine : PRESET_ROUTINES[0];
+  const todayStr = new Date().toISOString().slice(0, 10);
+  return `
+    <div class="card neon">
+      <span class="tag teal">PASO 11 · REGISTRO DE SESIÓN</span>
+      <h2 style="margin-top:6px">Registrar mi Actividad</h2>
+      <form onsubmit="saveActivityRecord(event)" class="view" style="margin-top:12px">
+        <label class="f">Fecha de realización<input type="date" id="lg_date" required value="${todayStr}"></label>
+        <label class="f">Rutina completada
+          <select id="lg_rout">
+            ${PRESET_ROUTINES.map(p => `<option value="${esc(p.title.es)}" ${p.id === r.id ? "selected" : ""}>${esc(p.title.es)}</option>`).join("")}
+          </select>
+        </label>
+        <div class="grid2">
+          <label class="f">Duración (mins)<input type="number" id="lg_dur" min="1" max="180" required value="15"></label>
+          <label class="f">Esfuerzo percibido (1-10)<input type="number" id="lg_rpe" min="1" max="10" required value="7"></label>
+        </div>
+        <label class="f">Dolor durante la sesión (0-10): <span id="lg_pain_lbl">2/10</span>
+          <input type="range" id="lg_pain" min="0" max="10" value="2" oninput="document.getElementById('lg_pain_lbl').textContent=this.value+'/10'">
+        </label>
+        <label class="f">Ejercicios, series y repeticiones realizadas
+          <input type="text" id="lg_exs" value="${esc(r.items.map(i => getEx(i.ex).n.es + " (" + i.sets + "x" + (i.unit === "s" ? i.hold + "s" : i.reps) + ")").join(", "))}">
+        </label>
+        <label class="f">Observaciones del usuario
+          <textarea id="lg_obs">Completé los ejercicios indicados.</textarea>
+        </label>
+        <button type="submit" class="btn block">${t("saveRecord").toUpperCase()}</button>
+      </form>
+    </div>
+  `;
+}
+
+function saveActivityRecord(e) {
+  e.preventDefault();
+  S.logs.push({
+    id: "l_" + Date.now(),
+    date: document.getElementById("lg_date").value,
+    routine: document.getElementById("lg_rout").value,
+    duration: +document.getElementById("lg_dur").value || 15,
+    rpe: +document.getElementById("lg_rpe").value || 7,
+    pain: +document.getElementById("lg_pain").value || 0,
+    exs: document.getElementById("lg_exs").value,
+    obs: document.getElementById("lg_obs").value.trim(),
+    doneCount: 4, totalCount: 4
+  });
+  save();
+  UI.exec = null;
+  toast("Registro guardado en Mi Progreso");
+  switchTab("progress");
+}
+
+/* ===== PASO 12 DEL PPT: CONSULTAR MI EVOLUCIÓN (MI PROGRESO) ===== */
+function renderProgress() {
+  const totalSessions = S.logs.length;
+  const totalMins = S.logs.reduce((a, b) => a + (+b.duration || 0), 0);
+  const compliance = Math.min(100, Math.round((totalSessions / Math.max(1, 3)) * 100));
+  const days = ["L", "M", "M", "J", "V", "S", "D"];
+
+  return `
+    <div class="grid2">
+      <div class="stat"><b>${totalSessions}</b><span>Sesiones completadas</span></div>
+      <div class="stat"><b>${totalMins} mins</b><span>Tiempo acumulado</span></div>
+      <div class="stat"><b>${compliance}%</b><span>Cumplimiento semanal</span></div>
+      <div class="stat"><b>${S.logs.length ? S.logs[S.logs.length - 1].rpe + "/10" : "—"}</b><span>Último esfuerzo (RPE)</span></div>
+    </div>
+
+    <div class="card">
+      <div class="row spread">
+        <h3>Calendario & Resumen de Actividad (Paso 12)</h3>
+        <button class="btn sm alt" onclick="navigate('logActivity')">+ Registrar sesión</button>
+      </div>
+      <div class="bars" style="margin-top:12px">
+        ${days.map((d, i) => {
+          const active = i < totalSessions % 7 || (i === 5 && totalSessions > 0);
+          return `<div><span>${active ? "✓" : ""}</span><i class="${active ? "" : "zero"}" style="height:${active ? 68 : 10}px"></i><span>${d}</span></div>`;
+        }).join("")}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Historial de Sesiones y Observaciones</h3>
+      <div class="list" style="margin-top:10px">
+        ${S.logs.slice().reverse().map(l => `
+          <div class="card flat">
+            <div class="row spread">
+              <b>${esc(l.routine)}</b>
+              <span class="tag teal">${esc(l.date)}</span>
+            </div>
+            <p class="small" style="margin-top:4px">Duración: <b>${l.duration} mins</b> · Esfuerzo: <b>${l.rpe}/10</b> · Dolor: <b>${l.pain ?? 0}/10</b></p>
+            <p class="small muted" style="margin-top:4px">Observación: "${esc(l.obs)}"</p>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+/* ===== MÓDULO 5 DEL PPT: ANATOMÍA 3D Y ACCESO A MÓDULOS AVANZADOS ===== */
+const BODY_SHAPES = {
+  front: [
+    ["hombro", 27, 48, 9, 7], ["hombro", 73, 48, 9, 7], ["pecho", 50, 52, 14, 10],
+    ["brazo", 19, 72, 5, 16], ["brazo", 81, 72, 5, 16], ["core", 50, 78, 12, 15],
+    ["cadera", 50, 102, 14, 8], ["muslo", 41, 132, 7, 19], ["muslo", 59, 132, 7, 19],
+    ["pierna", 41, 174, 5, 20], ["pierna", 59, 174, 5, 20]
+  ],
+  back: [
+    ["hombro", 27, 48, 9, 7], ["hombro", 73, 48, 9, 7], ["espalda", 50, 64, 14, 20],
+    ["cadera", 50, 102, 14, 8], ["muslo", 41, 132, 7, 19], ["muslo", 59, 132, 7, 19],
+    ["pierna", 41, 174, 5, 20], ["pierna", 59, 174, 5, 20]
+  ]
+};
+
+function renderAnatomy() {
+  const mList = Object.entries(MUSCLES).filter(([k, m]) => UI.mreg === "all" || m.reg === UI.mreg);
+  return `
+    <div class="stage">
+      <div class="hud-top"><span class="badge3d">Modelo Anatómico 3D</span></div>
+      <canvas id="anat3d" style="height:240px"></canvas>
+    </div>
+
+    <div class="card">
+      <div class="bodymap">
+        <div>
+          <svg viewBox="0 0 100 205">
+            <circle class="hd" cx="50" cy="20" r="11"/>
+            ${BODY_SHAPES[UI.mside].map(([rg, cx, cy, rx, ry]) => `
+              <ellipse class="rg ${UI.mreg === rg ? "on" : ""}" cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" onclick="UI.mreg='${rg}';render()"/>
+            `).join("")}
+          </svg>
+          <div class="row" style="justify-content:center;margin-top:6px">
+            <button class="chip ${UI.mside === "front" ? "on" : ""}" onclick="UI.mside='front';render()">${t("front")}</button>
+            <button class="chip ${UI.mside === "back" ? "on" : ""}" onclick="UI.mside='back';render()">${t("back_")}</button>
+          </div>
+        </div>
+        <div>
+          <h3>Explora por región muscular</h3>
+          <p class="small muted" style="margin:6px 0">Toca una zona del modelo para resaltar los músculos en 3D y ver su función.</p>
+          <div class="chips">
+            <button class="chip ${UI.mreg === "all" ? "on" : ""}" onclick="UI.mreg='all';render()">${t("all")}</button>
+            ${Object.entries(REGIONS).map(([k, v]) => `<button class="chip ${UI.mreg === k ? "on" : ""}" onclick="UI.mreg='${k}';render()">${v}</button>`).join("")}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="list">
+      ${mList.map(([k, m]) => `
+        <div class="card">
+          <div class="row spread">
+            <b>${esc(mName(m))}</b>
+            <span class="tag teal">${esc(REGIONS[m.reg])}</span>
+          </div>
+          <p class="small" style="margin-top:6px"><b>Función:</b> ${esc(m.fn)}</p>
+          <p class="small muted" style="margin-top:4px"><b>Estiramiento:</b> ${esc(m.str)}</p>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+/* ===== PASO 13 DEL PPT: SEGUIMIENTO PROFESIONAL (PANEL DEL FISIOTERAPEUTA) ===== */
+function renderProfessional() {
+  const activeR = PRESET_ROUTINES.find(r => r.id === S.activeRoutineId) || PRESET_ROUTINES[0];
+  return `
+    <div class="card neon">
+      <span class="tag teal">PASO 13 · PANEL DEL FISIOTERAPEUTA</span>
+      <div class="row" style="margin-top:10px">
+        <div class="avatar-box">👨‍⚕️</div>
+        <div>
+          <h2>Dr. Fisioterapeuta</h2>
+          <p class="small muted">Especialista en Fisioterapia del Ejercicio · Programa Activo: <b>${esc(activeR.title.es)}</b></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Indicaciones y Modificaciones del Profesional</h3>
+      <div class="list" style="margin-top:10px">
+        ${S.physioMessages.map(m => `
+          <div class="card flat">
+            <div class="row spread"><b>${esc(m.from)}</b><span class="small muted">${esc(m.date)}</span></div>
+            <p class="small" style="margin-top:6px">${esc(m.text)}</p>
+          </div>
+        `).join("")}
+      </div>
+      <button class="btn sm alt" style="margin-top:10px" onclick="receivePhysioUpdate()">🔄 Simular ajuste de rutina del fisioterapeuta</button>
+    </div>
+
+    <div class="card">
+      <h3>Compartir Registros y Observaciones con el Fisioterapeuta</h3>
+      <p class="small muted" style="margin-top:4px">Envía el reporte actualizado de tus sesiones, duración, esfuerzo percibido y observaciones.</p>
+      <pre id="pro_report" class="card flat small" style="margin-top:10px;white-space:pre-wrap;overflow-x:auto">${esc(buildClinicalReport())}</pre>
+      <div class="row wrap" style="margin-top:10px">
+        <button class="btn" onclick="navigator.clipboard?.writeText(buildClinicalReport());toast('Reporte copiado y listo para compartir con tu fisioterapeuta')">📋 Copiar y Compartir Informe</button>
+      </div>
+    </div>
+  `;
+}
+
+function receivePhysioUpdate() {
+  S.physioMessages.unshift({
+    date: new Date().toLocaleDateString(),
+    from: "Dr. Fisioterapeuta",
+    text: "Actualización de dosis: Excelente cumplimiento. Incrementa 2 repeticiones en Elevación de talones y mantén el descanso en 60 segundos."
+  });
+  PRESET_ROUTINES[0].items[1].reps = 14;
+  save();
+  toast("Modificación de rutina recibida del fisioterapeuta");
+  render();
+}
+
+function buildClinicalReport() {
+  return [
+    `REPORTE CLÍNICO PHYSIOMOTION 3D (${new Date().toLocaleDateString()})`,
+    `Paciente: ${S.user.name} (${S.user.role}) | Actividad: ${S.user.activity}`,
+    `Objetivos: ${S.user.objectives.join(", ")}`,
+    `Programa Activo: ${(PRESET_ROUTINES.find(r => r.id === S.activeRoutineId) || PRESET_ROUTINES[0]).title.es}`,
+    `Sesiones registradas: ${S.logs.length} | Tiempo total: ${S.logs.reduce((a, b) => a + (+b.duration || 0), 0)} mins`,
+    `Últimas sesiones:`,
+    ...S.logs.slice(-4).map(l => `- ${l.date} (${l.routine}): ${l.duration} min, Esfuerzo ${l.rpe}/10, Dolor ${l.pain ?? 0}/10. Obs: ${l.obs}`)
+  ].join("\n");
+}
+
+/* ===== PÁGINAS 18 Y 19 DEL PPT + HTML 3: EDUCACIÓN, HIDRATACIÓN, NUTRICIÓN Y USO RESPONSABLE ===== */
+function renderEducation() {
+  const goal = Math.round((+S.user.weight || 68) * 35 / 250) * 250;
+  const pct = Math.min(100, Math.round((S.water.ml / goal) * 100));
+  return `
+    <div class="card neon">
+      <div class="row spread">
+        <h2>💧 1. Hidratación Diaria (Pág. 18)</h2>
+        <b>${S.water.ml} / ${goal} ml</b>
+      </div>
+      <div style="height:14px;background:var(--surface2);border-radius:99px;margin:10px 0;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:var(--accent)"></div>
+      </div>
+      <div class="row wrap">
+        <button class="btn sm" onclick="S.water.ml+=250;save();render()">+ 1 vaso (250 ml)</button>
+        <button class="btn sm ghost" onclick="S.water.ml=Math.max(0,S.water.ml-250);save();render()">- 1 vaso</button>
+      </div>
+    </div>
+
+    <div class="list">
+      ${NUTRI.map(n => `
+        <details class="acc" open>
+          <summary><span>${esc(n.t)}<br><span class="small muted">${esc(n.d)}</span></span><span>▾</span></summary>
+          <div><ul class="dots">${n.tips.map(x => `<li class="small">${esc(x)}</li>`).join("")}</ul></div>
+        </details>
+      `).join("")}
+    </div>
+
+    <div class="card">
+      <h3>Tabla Nutricional de Referencia (por 100 g)</h3>
+      <div style="overflow-x:auto;margin-top:8px">
+        <table class="tb">
+          <thead><tr><th>Alimento</th><th>kcal</th><th>Prot.</th><th>Carb.</th><th>Grasa</th></tr></thead>
+          <tbody>${FOODS.map(f => `<tr><td>${f[0]}</td><td>${f[1]}</td><td>${f[2]}g</td><td>${f[3]}g</td><td>${f[4]}g</td></tr>`).join("")}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Recetas para Recuperación Muscular</h3>
+      <div class="list" style="margin-top:8px">
+        ${RECIPES.map(r => `<div class="card flat"><b>${esc(r.t)} (${r.tm})</b><p class="small muted" style="margin-top:4px">${r.ing.join(" · ")}</p><p class="small" style="margin-top:4px">${esc(r.st)}</p></div>`).join("")}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🛡️ Uso Responsable y Privacidad (Pág. 19 del Manual)</h3>
+      <ul class="dots small" style="margin-top:8px">
+        <li>Seguir siempre las rutinas indicadas por el profesional.</li>
+        <li>Leer las instrucciones antes de realizar cada ejercicio y usar un espacio seguro y despejado.</li>
+        <li>Respetar los descansos establecidos entre series.</li>
+        <li><b>Detener el ejercicio si aparece dolor intenso, mareo o dificultad respiratoria.</b></li>
+        <li><b>Privacidad & Aviso:</b> PhysioMotion 3D no diagnostica lesiones ni sustituye la atención de un profesional de salud. La información de menores requiere protección y autorización de sus padres o tutores.</li>
+      </ul>
+    </div>
+  `;
+}
+
+/* ===== PASO 4 Y 5 DEL PPT: CONFIGURAR MI PERFIL E IDIOMA ===== */
+function renderProfile() {
+  const u = S.user;
+  return `
+    <div class="card neon">
+      <div class="row">
+        <div class="avatar-box">${u.avatar ? `<img src="${u.avatar}" alt="Avatar">` : "👤"}</div>
+        <div>
+          <h2>${esc(u.name)}</h2>
+          <p class="small muted">${esc(u.email)} · ${esc(u.role)}</p>
+          <input type="file" id="av_in" accept="image/*" hidden onchange="uploadAvatar(event)">
+          <label for="av_in" class="chip" style="margin-top:6px;cursor:pointer">📷 Cambiar foto/avatar</label>
+        </div>
+      </div>
+    </div>
+
+    <form onsubmit="saveProfile(event)" class="card view">
+      <h3>Configurar Datos Personales (Paso 4)</h3>
+      <label class="f">Nombres y apellidos<input type="text" id="pf_name" value="${esc(u.name)}" required></label>
+      <div class="grid2">
+        <label class="f">Fecha de nacimiento<input type="date" id="pf_dob" value="${esc(u.dob)}"></label>
+        <label class="f">Peso corporal (kg)<input type="number" id="pf_w" value="${esc(u.weight)}"></label>
+      </div>
+      <label class="f">Nivel de actividad física
+        <select id="pf_act">
+          ${["Sedentario / Rehabilitación inicial", "Ligero (1-2 días/sem)", "Moderado (2-3 días/sem)", "Alto / Entrenamiento deportivo"].map(a => `<option ${u.activity === a ? "selected" : ""}>${a}</option>`).join("")}
+        </select>
+      </label>
+
+      <div>
+        <b class="small">Seleccionar Idioma (Paso 5 del Manual)</b>
+        <div class="chips" style="margin-top:8px">
+          <button type="button" class="chip ${S.lang === "es" ? "on" : ""}" onclick="S.lang='es';save();render()">ESPAÑOL</button>
+          <button type="button" class="chip ${S.lang === "en" ? "on" : ""}" onclick="S.lang='en';save();render()">ENGLISH</button>
+          <button type="button" class="chip ${S.lang === "de" ? "on" : ""}" onclick="S.lang='de';save();render()">DEUTSCH</button>
+        </div>
+      </div>
+
+      <div>
+        <b class="small">Objetivos Generales (Paso 4 del Manual)</b>
+        <div class="list" style="margin-top:8px">
+          ${PPT_OBJECTIVES.map(obj => `
+            <label class="check">
+              <input type="checkbox" name="pf_obj" value="${esc(obj)}" ${u.objectives.includes(obj) ? "checked" : ""}>
+              <span class="small">${esc(obj)}</span>
+            </label>
+          `).join("")}
+        </div>
+      </div>
+
+      <div>
+        <b class="small">Preferencias de Accesibilidad</b>
+        <label class="check"><input type="checkbox" id="pf_big" ${S.bigText ? "checked" : ""}> <span>Activar texto grande para lectura fácil</span></label>
+      </div>
+
+      <p class="small muted">Importante: esta información ayuda a organizar la experiencia, pero no sustituye una evaluación fisioterapéutica (Pág. 8).</p>
+      <button type="submit" class="btn block">${t("saveChanges").toUpperCase()}</button>
+      <button type="button" class="btn danger block" onclick="S.loggedIn=false;UI.screen='welcome';save();render()">${t("logout")}</button>
+    </form>
+  `;
+}
+
+function uploadAvatar(ev) {
+  const f = ev.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => { S.user.avatar = r.result; save(); render(); };
+  r.readAsDataURL(f);
+}
+
+function saveProfile(e) {
+  e.preventDefault();
+  S.user.name = document.getElementById("pf_name").value.trim();
+  S.user.dob = document.getElementById("pf_dob").value;
+  S.user.weight = +document.getElementById("pf_w").value || 68;
+  S.user.activity = document.getElementById("pf_act").value;
+  S.user.objectives = [...document.querySelectorAll("input[name='pf_obj']:checked")].map(x => x.value);
+  S.bigText = document.getElementById("pf_big").checked;
+  save();
+  toast("Perfil actualizado correctamente");
+  render();
+}
+
+/* ===== FUNCIONES ADICIONALES RECUPERADAS DEL TERCER HTML ===== */
+function renderDoseCalc() {
+  const d = UI.dose;
+  const ex = getEx(d.ex);
+  const stop = d.pain >= 7;
+  const sets = d.pain >= 4 ? 2 : 3;
+  const reps = ex.ct === "iso" ? "30 s" : (d.goal === "fuerza" ? "8 reps" : "12 reps");
+  const rest = d.group === "mayor" ? 90 : 60;
+
+  return `
+    <div class="card">
+      <h2>Calculadora Clínica de Dosificación</h2>
+      <div class="view" style="margin-top:10px">
+        <label class="f">Ejercicio<select onchange="UI.dose.ex=this.value;render()">${allEx().map(e => `<option value="${e.id}" ${e.id === d.ex ? "selected" : ""}>${esc(exName(e))}</option>`).join("")}</select></label>
+        <div class="grid2">
+          <label class="f">Perfil<select onchange="UI.dose.group=this.value;render()">${Object.entries(GROUPS).map(([k, v]) => `<option value="${k}" ${k === d.group ? "selected" : ""}>${v}</option>`).join("")}</select></label>
+          <label class="f">Objetivo<select onchange="UI.dose.goal=this.value;render()"><option value="fuerza">Fuerza</option><option value="control">Control motor</option><option value="dolor">Alivio del dolor</option></select></label>
+        </div>
+        <label class="f">Dolor actual: <b>${d.pain}/10</b><input type="range" min="0" max="10" value="${d.pain}" oninput="UI.dose.pain=+this.value;render()"></label>
+      </div>
+    </div>
+    ${stop ? `<div class="alert danger"><span>Dolor ${d.pain}/10: Se recomienda suspender la carga y acudir a evaluación fisioterapéutica presencial.</span></div>` : `
+      <div class="card neon">
+        <h3>Dosis Sugerida</h3>
+        <div class="grid2" style="margin-top:8px">
+          <div class="stat"><b>${sets}</b><span>Series</span></div>
+          <div class="stat"><b>${reps}</b><span>Volumen</span></div>
+          <div class="stat"><b>${rest} s</b><span>Descanso</span></div>
+          <div class="stat"><b>${d.pain >= 4 ? "4/10" : "6/10"}</b><span>Esfuerzo RPE</span></div>
+        </div>
+      </div>
+    `}
+  `;
+}
+
+/* ===== ESCÁNER CORPORAL BASADO EN DATOS BIOMÉTRICOS Y CLÍNICOS ===== */
+function initScanState() {
+  if (!UI.scan.step) {
+    UI.scan = {
+      step: 1, // 1: Subir foto, 2: Datos básicos, 3: Resultados
+      img: null,
+      age: 22,
+      gender: "Femenino",
+      height: 165,
+      weight: S.user.weight || 65,
+      activity: S.user.activity || "Moderado (2-3 días/sem)",
+      postureHabit: "Sentado > 6 horas (estudio / oficina)",
+      zone: "Rodilla",
+      side: "Derecho",
+      stiffness: 3,
+      result: null
+    };
+  }
+  return UI.scan;
+}
+
+function renderScanner() {
+  const sc = initScanState();
+
+  // PASO 1: SUBIR FOTO (GALERÍA O CÁMARA)
+  if (sc.step === 1) {
+    return `
+      <div class="card neon">
+        <span class="tag teal">PASO 1 DE 3 · CAPTURA CORPORAL</span>
+        <h2 style="margin-top:6px">Escáner Corporal: Postura y Goniometría</h2>
+        <p class="small muted" style="margin-top:6px">
+          Toma una foto al instante con tu cámara o súbela desde tu galería para iniciar el registro biométrico.
+        </p>
+
+        <input type="file" id="sc_cam" accept="image/*" capture="environment" hidden onchange="loadScanImage(event)">
+        <input type="file" id="sc_gal" accept="image/*" hidden onchange="loadScanImage(event)">
+
+        <div class="view" style="margin-top:14px;gap:10px">
+          <label for="sc_cam" class="btn block" style="cursor:pointer">
+            📷 Tomar foto corporal con la cámara
+          </label>
+          <label for="sc_gal" class="btn alt block" style="cursor:pointer">
+            🖼️ Subir foto desde la galería
+          </label>
+        </div>
+      </div>
+
+      ${S.scans && S.scans.length ? `
+        <div class="card">
+          <h3> Evaluaciones guardadas recientemente</h3>
+          <div class="list" style="margin-top:8px">
+            ${S.scans.slice(-3).reverse().map(s => `
+              <div class="card flat">
+                <b>${esc(s.zone)} · ${new Date(s.t).toLocaleDateString()}</b>
+                <p class="small muted" style="margin-top:4px;white-space:pre-wrap">${esc(s.text)}</p>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      ` : ""}
+    `;
+  }
+
+  // PASO 2: FORMULARIO DE DATOS BÁSICOS Y CLÍNICOS
+  if (sc.step === 2) {
+    return `
+      <div class="card neon">
+        <div class="row spread">
+          <span class="tag teal">PASO 2 DE 3 · DATOS BIOMÉTRICOS</span>
+          <button class="chip" onclick="UI.scan.step=1;render()">Cambiar foto</button>
+        </div>
+        <div style="margin-top:10px;text-align:center">
+          <img src="${sc.img}" alt="Vista previa" style="max-height:170px;border-radius:12px;border:1.5px solid var(--accent);object-fit:cover">
+        </div>
+        <h2 style="margin-top:10px">Completa tus datos para el análisis</h2>
+        <p class="small muted" style="margin-top:4px">
+          El cálculo postural y goniométrico se generará en base a tu perfil antropométrico y funcional.
+        </p>
+
+        <form onsubmit="processBiometricScan(event)" class="view" style="margin-top:12px">
+          <div class="grid2">
+            <label class="f">Edad (años)
+              <input type="number" id="sc_age" min="5" max="100" required value="${sc.age}">
+            </label>
+            <label class="f">Género
+              <select id="sc_gender">
+                <option value="Femenino" ${sc.gender === "Femenino" ? "selected" : ""}>Femenino</option>
+                <option value="Masculino" ${sc.gender === "Masculino" ? "selected" : ""}>Masculino</option>
+                <option value="Otro" ${sc.gender === "Otro" ? "selected" : ""}>Otro</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="grid2">
+            <label class="f">Estatura (cm)
+              <input type="number" id="sc_height" min="90" max="230" required value="${sc.height}">
+            </label>
+            <label class="f">Peso (kg)
+              <input type="number" id="sc_weight" min="20" max="220" required value="${sc.weight}">
+            </label>
+          </div>
+
+          <label class="f">Nivel de actividad física
+            <select id="sc_act">
+              <option value="Sedentario">Sedentario (poca actividad semanal)</option>
+              <option value="Ligero">Ligero (caminatas o 1-2 días/sem)</option>
+              <option value="Moderado" selected>Moderado (entrenamiento 2-3 días/sem)</option>
+              <option value="Alto">Alto rendimiento / Deportista (4+ días/sem)</option>
+            </select>
+          </label>
+
+          <label class="f">Postura habitual en el día
+            <select id="sc_habit">
+              <option value="sentado">Sentado > 6 horas (estudio / computadora)</option>
+              <option value="pie">De pie prolongado (> 5 horas al día)</option>
+              <option value="carga">Esfuerzo físico o levantamiento de peso</option>
+              <option value="alternado">Postura alternada / activa</option>
+            </select>
+          </label>
+
+          <div class="grid2">
+            <label class="f">Articulación a evaluar
+              <select id="sc_zone">
+                <option value="Rodilla">Rodilla</option>
+                <option value="Hombro">Hombro y Escápula</option>
+                <option value="Cadera">Cadera y Pelvis</option>
+                <option value="Tobillo">Tobillo y Pie</option>
+                <option value="Columna">Columna Cervical / Lumbar</option>
+              </select>
+            </label>
+            <label class="f">Lado evaluado
+              <select id="sc_side">
+                <option value="Derecho">Derecho</option>
+                <option value="Izquierdo">Izquierdo</option>
+                <option value="Bilateral">Ambos lados (Bilateral)</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="f">Nivel de molestia o rigidez articular: <b id="sc_stiff_lbl">${sc.stiffness}/10</b>
+            <input type="range" id="sc_stiff" min="0" max="10" value="${sc.stiffness}"
+              oninput="document.getElementById('sc_stiff_lbl').textContent=this.value+'/10'">
+          </label>
+
+          <button type="submit" class="btn block" style="margin-top:6px">
+            🔍 Realizar Escáner de Postura y Goniometría
+          </button>
+        </form>
+      </div>
+    `;
+  }
+
+  // PASO 3: PANTALLA DE RESULTADOS CON LA FOTO ARRIBA
+  const res = sc.result;
+  return `
+    <div class="card neon">
+      <div class="row spread">
+        <span class="tag teal">ESCÁNER COMPLETADO · PASO 3 DE 3</span>
+        <span class="small muted">${new Date().toLocaleDateString()}</span>
+      </div>
+
+      <!-- FOTO SUBIDA EN LA PARTE SUPERIOR -->
+      <div style="position:relative;margin-top:12px;border-radius:16px;overflow:hidden;border:2px solid var(--accent);background:#000;text-align:center">
+        <img src="${sc.img}" alt="Foto corporal escaneada" style="width:100%;max-height:310px;object-fit:contain;display:block;margin:0 auto">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,229,255,0.08) 0%,transparent 50%,rgba(7,11,30,0.85) 100%);pointer-events:none"></div>
+        <div style="position:absolute;bottom:10px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center">
+          <span class="tag teal">Zona: ${esc(sc.zone)} (${esc(sc.side)})</span>
+          <span class="tag" style="background:rgba(0,0,0,0.75);color:#fff">${sc.age} años · ${esc(sc.gender)} · IMC ${res.bmi}</span>
+        </div>
+      </div>
+
+      <div class="grid2" style="margin-top:12px">
+        <div class="stat"><b>${res.postureScore}/100</b><span>Índice de Alineación Postural</span></div>
+        <div class="stat"><b>${res.romPct}%</b><span>Movilidad Funcional (ROM)</span></div>
+      </div>
+    </div>
+
+    <!-- RESULTADOS DE EVALUACIÓN POSTURAL -->
+    <div class="card">
+      <h3>1. Evaluación Postural Estimada</h3>
+      <div class="list" style="margin-top:10px">
+        <div class="card flat">
+          <b>Plano Frontal (Hombros, Pelvis y Miembros Inferiores)</b>
+          <p class="small" style="margin-top:4px">${esc(res.frontalText)}</p>
+        </div>
+        <div class="card flat">
+          <b>Plano Sagital (Curvaturas Raquídeas y Centro de Gravedad)</b>
+          <p class="small" style="margin-top:4px">${esc(res.sagittalText)}</p>
+        </div>
+        <div class="card flat">
+          <b>Impacto Biomecánico (IMC ${res.bmi} · ${esc(res.bmiLabel)})</b>
+          <p class="small" style="margin-top:4px">${esc(res.loadText)}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTADOS DE GONIOMETRÍA ARTICULAR -->
+    <div class="card">
+      <h3>2. Goniometría Articular: ${esc(sc.zone)} (${esc(sc.side)})</h3>
+      <p class="small muted" style="margin-top:4px">
+        Comparativa entre el ángulo articular estimado según tu perfil y el rango fisiológico normal (AAOS).
+      </p>
+      <div style="overflow-x:auto;margin-top:10px">
+        <table class="tb">
+          <thead>
+            <tr>
+              <th>Movimiento</th>
+              <th>Tu Ángulo</th>
+              <th>Rango Normal</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${res.goniometry.map(g => `
+              <tr>
+                <td><b>${esc(g.mov)}</b></td>
+                <td style="color:var(--accent);font-weight:800">${g.val}°</td>
+                <td>${g.norm}</td>
+                <td><span class="tag ${g.ok ? "teal" : "warn"}">${g.status}</span></td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RECOMENDACIÓN CLÍNICA Y BOTONES DE ACCIÓN -->
+    <div class="card">
+      <h3>3. Recomendación Fisioterapéutica</h3>
+      <p class="small" style="margin-top:6px">${esc(res.recommendation)}</p>
+      <div class="row wrap" style="margin-top:14px">
+        <button class="btn" onclick="saveBiometricScan()">💾 Guardar en Historial e Informe</button>
+        <button class="btn ghost" onclick="UI.scan.step=2;render()">✏️ Editar datos</button>
+        <button class="btn alt" onclick="UI.scan.step=1;UI.scan.img=null;render()">🔄 Nuevo escáner</button>
+      </div>
+    </div>
+  `;
+}
+
+function loadScanImage(ev) {
+  const f = ev.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    initScanState();
+    UI.scan.img = reader.result;
+    UI.scan.step = 2;
+    render();
+    window.scrollTo(0, 0);
+  };
+  reader.readAsDataURL(f);
+}
+
+function processBiometricScan(e) {
+  e.preventDefault();
+  const sc = UI.scan;
+  sc.age = +document.getElementById("sc_age").value || 22;
+  sc.gender = document.getElementById("sc_gender").value;
+  sc.height = +document.getElementById("sc_height").value || 165;
+  sc.weight = +document.getElementById("sc_weight").value || 65;
+  sc.activity = document.getElementById("sc_act").value;
+  sc.postureHabit = document.getElementById("sc_habit").value;
+  sc.zone = document.getElementById("sc_zone").value;
+  sc.side = document.getElementById("sc_side").value;
+  sc.stiffness = +document.getElementById("sc_stiff").value || 0;
+
+  // Cálculo de IMC y reducciones funcionales por rigidez/edad/sedentarismo
+  const hMeters = sc.height / 100;
+  const bmi = +(sc.weight / (hMeters * hMeters)).toFixed(1);
+  const bmiLabel = bmi < 18.5 ? "Bajo peso" : bmi < 25 ? "Normopeso" : bmi < 30 ? "Sobrepeso ligero" : "Sobrecarga ponderal";
+  const penalty = Math.round(sc.stiffness * 2.2 + (sc.age > 50 ? 6 : 0) + (sc.activity === "Sedentario" ? 5 : 0));
+
+  // Evaluación Postural según hábitos y datos
+  const tiltShoulder = (1.2 + sc.stiffness * 0.35 + (sc.side !== "Bilateral" ? 0.8 : 0)).toFixed(1);
+  const tiltPelvis = (1.0 + sc.stiffness * 0.25).toFixed(1);
+
+  const frontalText = `Inclinación escapular estimada de ${tiltShoulder}° y báscula pélvica de ${tiltPelvis}° (${tiltShoulder > 3 ? "leve asimetría funcional hacia el lado " + sc.side.toLowerCase() : "dentro de parámetros funcionales"}). Alineación de ejes de miembros inferiores conservada.`;
+
+  const sagittalMap = {
+    sentado: "Tendencia a la antepulsión cefálica (+2.5 cm), protracción escapular y acortamiento de flexores de cadera (psoas e isquiotibiales) por sedestación prolongada.",
+    pie: "Tendencia a la anteversión pélvica e hiperlordosis lumbar compensatoria con sobrecarga en tríceps sural y fascia plantar.",
+    carga: "Aumento de tensión en erectores espinales y requerimiento de estabilización del core profundo (transverso abdominal) ante esfuerzos axiales.",
+    alternado: "Curvaturas fisiológicas cervical, dorsal y lumbar equilibradas con adecuada distribución del centro de gravedad."
+  };
+  const sagittalText = sagittalMap[sc.postureHabit] || sagittalMap.alternado;
+
+  const loadText = `Con estatura de ${sc.height} cm y peso de ${sc.weight} kg (IMC ${bmi}), la carga mecánica sobre ${sc.zone.toLowerCase()} es ${bmi < 25 ? "óptima y sin sobrecarga axial adicional" : "moderada; se sugiere priorizar control excéntrico y fortalecimiento de estabilizadores"}.`;
+
+  // Tabla Goniométrica según la articulación seleccionada
+  const baseRom = {
+    Rodilla: [
+      { mov: "Flexión de rodilla", base: 135, norm: "0° - 135°" },
+      { mov: "Extensión activa", base: 0, norm: "0° (Completa)", isZero: true },
+      { mov: "Rotación tibial interna", base: 28, norm: "0° - 30°" }
+    ],
+    Hombro: [
+      { mov: "Flexión anterior", base: 178, norm: "0° - 180°" },
+      { mov: "Abducción glenohumeral", base: 175, norm: "0° - 180°" },
+      { mov: "Rotación externa (a 90°)", base: 85, norm: "0° - 90°" }
+    ],
+    Cadera: [
+      { mov: "Flexión coxofemoral", base: 120, norm: "0° - 120°" },
+      { mov: "Abducción de cadera", base: 42, norm: "0° - 45°" },
+      { mov: "Extensión activa", base: 28, norm: "0° - 30°" }
+    ],
+    Tobillo: [
+      { mov: "Dorsiflexión (Flexión dorsal)", base: 20, norm: "0° - 20°" },
+      { mov: "Flexión plantar", base: 48, norm: "0° - 50°" },
+      { mov: "Inversión subtalar", base: 32, norm: "0° - 35°" }
+    ],
+    Columna: [
+      { mov: "Flexión dorso-lumbar", base: 80, norm: "0° - 80°" },
+      { mov: "Extensión raquídea", base: 28, norm: "0° - 30°" },
+      { mov: "Inclinación lateral", base: 35, norm: "0° - 35°" }
+    ]
+  }[sc.zone];
+
+  const goniometry = baseRom.map(item => {
+    if (item.isZero) {
+      const deficit = sc.stiffness >= 5 ? -3 : 0;
+      return { mov: item.mov, val: deficit, norm: item.norm, ok: deficit === 0, status: deficit === 0 ? "Funcional" : "Leve limitación" };
+    }
+    const loss = Math.round((item.base * penalty) / 100);
+    const val = Math.max(10, item.base - loss);
+    const ok = loss <= item.base * 0.12;
+    return {
+      mov: item.mov,
+      val,
+      norm: item.norm,
+      ok,
+      status: ok ? "Óptimo" : "Reducido (-" + loss + "°)"
+    };
+  });
+
+  const postureScore = Math.max(55, 96 - penalty * 2);
+  const romPct = Math.max(60, 100 - penalty);
+
+  const recMap = {
+    Rodilla: "Se recomienda la rutina de Sentadilla a silla (3D) con descenso controlado en 3 segundos y fortalecimiento isométrico de cuádriceps (Wall Sit).",
+    Hombro: "Se recomienda la Rutina de Hombro (Elevación frontal, Abducción lateral hasta 90° y Remo escapular con banda) cuidando no encoger el trapecio.",
+    Cadera: "Se recomienda la Rutina de Cadera y Pelvis (Puente de glúteos y Abducción de pie) para estabilizar el glúteo medio.",
+    Tobillo: "Se recomienda el Programa Asignado de Rehabilitación de Tobillo (Elevación de talones, Descenso excéntrico y Equilibrio monopodal).",
+    Columna: "Se recomienda Movilidad torácica y escapular combinada con Respiración diafragmática guiada y Plancha isométrica."
+  };
+
+  sc.result = {
+    bmi,
+    bmiLabel,
+    postureScore,
+    romPct,
+    frontalText,
+    sagittalText,
+    loadText,
+    goniometry,
+    recommendation: recMap[sc.zone]
+  };
+
+  sc.step = 3;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function saveBiometricScan() {
+  const sc = UI.scan;
+  if (!sc.result) return;
+  const summary = `Zona: ${sc.zone} (${sc.side}) | ${sc.age} años, ${sc.gender}, IMC ${sc.result.bmi} | Alineación: ${sc.result.postureScore}/100 | Goniometría: ${sc.result.goniometry.map(g => g.mov + " " + g.val + "°").join(", ")}.`;
+  S.scans.push({
+    t: Date.now(),
+    zone: sc.zone + " (" + sc.side + ")",
+    text: summary
+  });
+  save();
+  toast("Evaluación postural y goniométrica guardada en el historial");
+}
+
+function renderWatchTimer() {
+  const tm = UI.timer;
+  return `
+    <div class="card" style="text-align:center">
+      <span class="tag teal">INTEGRACIÓN RELOJ INTELIGENTE (PÁGS. 4 Y 18)</span>
+      <h2 style="margin-top:6px">Temporizador de Series y Descansos</h2>
+      <div class="ring" style="--p:${Math.round((tm.rem / (tm.work || 30)) * 100)};margin:16px auto">
+        <div>
+          <b id="wt_rem">${tm.rem}s</b>
+          <span class="small muted">Ronda ${tm.round}/${tm.rounds}</span>
+        </div>
+      </div>
+      <div class="row" style="justify-content:center">
+        <button class="btn" onclick="toggleWatchTimer()">${tm.run ? "⏸ Pausar" : "▶ Iniciar"}</button>
+        <button class="btn ghost" onclick="UI.timer.run=false;UI.timer.rem=UI.timer.work;render()">Reiniciar</button>
+      </div>
+    </div>
+  `;
+}
+
+let wtInterval = null;
+function toggleWatchTimer() {
+  UI.timer.run = !UI.timer.run;
+  clearInterval(wtInterval);
+  if (UI.timer.run) {
+    wtInterval = setInterval(() => {
+      if (!UI.timer.run) return;
+      UI.timer.rem = Math.max(0, UI.timer.rem - 1);
+      const el = document.getElementById("wt_rem");
+      if (el) el.textContent = UI.timer.rem + "s";
+      if (UI.timer.rem === 0) {
+        beep(960, 0.25);
+        UI.timer.round = (UI.timer.round % UI.timer.rounds) + 1;
+        UI.timer.rem = UI.timer.work;
+        render();
+      }
+    }, 1000);
+  }
+  render();
+}
+
+function renderRoutes() {
+  const g = UI.routeGroup;
+  const r = ROUTES[g];
+  return `
+    <div class="chips">
+      ${Object.entries(GROUPS).map(([k, v]) => `<button class="chip ${g === k ? "on" : ""}" onclick="UI.routeGroup='${k}';render()">${v}</button>`).join("")}
+    </div>
+    <div class="card neon">
+      <h2>Ruta: ${GROUPS[g]}</h2>
+      <p class="small" style="margin-top:6px">${esc(r.desc)}</p>
+      <p class="small muted" style="margin-top:4px"><b>Enfoque:</b> ${esc(r.innov)}</p>
+    </div>
+    <div class="list">
+      ${r.items.map(id => {
+        const e = getEx(id);
+        return `<button class="item" onclick="navigate('exDetail','${e.id}')"><span class="ico">${ic("dumbbell")}</span><span class="grow"><span class="nm">${esc(exName(e))}</span><br><span class="small muted">${esc(e.obj)}</span></span></button>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+/* ===== CICLO DE IDIOMA, TEMA Y HOOKS POST-RENDER ===== */
+function cycleLang() {
+  const order = ["es", "en", "de"];
+  S.lang = order[(order.indexOf(S.lang) + 1) % 3];
+  save();
+  render();
+}
+
+function toggleTheme() {
+  S.theme = S.theme === "dark" ? "light" : "dark";
+  save();
+  render();
+}
+
+function afterRender() {
+  const authCv = document.getElementById("auth3d");
+  if (authCv) {
+    ACTIVE_VIEWER = new Viewer3D(authCv, { yaw: 35, auto: true });
+    ACTIVE_VIEWER.setExercise(getEx("sts"), ["quad", "glutmax"].flatMap(m => MUSCLES[m].seg));
+  }
+  const exCv = document.getElementById("ex3d");
+  if (exCv) {
+    const e = getEx(UI.param);
+    ACTIVE_VIEWER = new Viewer3D(exCv, { yaw: 35, auto: true });
+    ACTIVE_VIEWER.setExercise(e, segsOfEx(e));
+    if (UI.exTab === "videos") loadVideoList(e.id);
+  }
+  const execCv = document.getElementById("exec3d");
+  if (execCv && UI.exec) {
+    const e = getEx(UI.exec.routine.items[UI.exec.idx].ex);
+    ACTIVE_VIEWER = new Viewer3D(execCv, { yaw: 35, auto: false });
+    ACTIVE_VIEWER.setExercise(e, segsOfEx(e));
+  }
+  const anatCv = document.getElementById("anat3d");
+  if (anatCv) {
+    const segs = Object.values(MUSCLES).filter(m => UI.mreg === "all" || m.reg === UI.mreg).flatMap(m => m.seg);
+    ACTIVE_VIEWER = new Viewer3D(anatCv, { yaw: 35, auto: true });
+    ACTIVE_VIEWER.setExercise({ pose: { A: {}, B: {}, hold: 1 } }, UI.mreg === "all" ? ["thighL", "thighR", "torsoLow"] : segs);
+  }
+  const scanCv = document.getElementById("scan_cv");
+  if (scanCv && UI.scan.imgEl) {
+    const w = scanCv.parentElement.clientWidth || 320;
+    const im = UI.scan.imgEl;
+    const h = Math.round(w * im.naturalHeight / im.naturalWidth);
+    scanCv.width = w; scanCv.height = h;
+    const ctx = scanCv.getContext("2d");
+    ctx.drawImage(im, 0, 0, w, h);
+    ctx.strokeStyle = "#00E5FF"; ctx.lineWidth = 3; ctx.fillStyle = "#FF4D4D";
+    const P = UI.scan.pts.map(p => ({ x: p.x * w, y: p.y * h }));
+    if (P.length > 1) {
+      ctx.beginPath(); P.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.stroke();
+    }
+    P.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, 7); ctx.fill(); });
+  }
+}
+
+window.addEventListener("DOMContentLoaded", () => render());
+  </script>
+</body>
+</html>
